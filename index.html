@@ -17,6 +17,8 @@
             $("#searchButton").click(function(){
                 var target = $('#searchValue').val();
 
+                $("#accordionPanels").html("");
+
                 $.ajax({
                     url: "/brutalSearch?keyword="+target,
                     success: function(result){
