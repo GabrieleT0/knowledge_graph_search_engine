@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "express": "^4.17.1",
+    "kgs_results_aggregator": "^0.1.1",
     "lodcloud-querier": "^0.1.1"
   }
 }

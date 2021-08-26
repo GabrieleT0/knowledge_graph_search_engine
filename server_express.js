@@ -1,11 +1,11 @@
 const express = require('express');
 var fs = require('fs');
-var lc_querier = require('lodcloud-querier');
+var kgs_aggregator = require('kgs_results_aggregator');
 
 const PORT = process.env.PORT || 8080;
 
 const app = express(); 
-var querier = new lc_querier();
+var querier = new kgs_aggregator();
 
 //serviamo in GET la root
 app.get('/', (req, res) => {
