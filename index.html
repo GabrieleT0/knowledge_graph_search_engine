@@ -13,101 +13,115 @@
 
     <script>
         $(document).ready(function(){
+          
+          /*
+          $('#rankingForm input').on('change', function() {
+            alert($('input[name=rankingOptions]:checked', '#rankingForm').val()); 
+          });*/
             
-            $("#searchButton").click(function(){
-                var target = $('#searchValue').val();
-                console.log(target);
-                if(target != ''){
-                  $("#accordionPanels").html("");
+          $("#searchButton").click(function(){
+              var target = $('#searchValue').val();
+              var rankingMode = $('input[name=rankingOptions]:checked', '#rankingForm').val();
 
-                  $.ajax({
-                      url: "/brutalSearch?keyword="+target,
-                      success: function(result){
-                          var i = 0;
-                          for(kg in result){
+              var tags = new Array();
+              $.each($("input[name='tagSelection']:checked"), function() {
+                tags.push($(this).val());
+                // or you can do something to the actual checked checkboxes by working directly with  'this'
+                // something like $(this).hide() (only something useful, probably) :P
+              });
 
-                            // keywords formatting section
-                            /*
-                            var currentKeywords = "<pre><ul class='list-group list-group-horizontal'>";
-                            for(key in result[kg]["keywords"]){
-                              currentKeywords += "<li class='list-group-item' style='color:grey;'>" + result[kg]["keywords"][key] + "</li>";
-                            }
-                            currentKeywords += "</ul></pre>" */
+              console.log(rankingMode);
+              if(target != ''){
+                $("#accordionPanels").html("");
 
-                            var currentKeywords  = "<pre>"
-                            for(key in result[kg]["keywords"]){
-                              currentKeywords += "<span class='badge rounded-pill bg-secondary'>" + result[kg]["keywords"][key] + "</span>"
-                            }
-                            currentKeywords += "</pre>";
+                $.ajax({
+                    url: "/brutalSearch?keyword="+target+"&rankBy="+rankingMode,
+                    success: function(result){
+                        var i = 0;
+                        for(kg in result){
 
-                            //links formatting section
-                            var currentLinks;
-                            if(result[kg]["links"] != ""){
-                                currentLinks = "<pre><ul class='list-group'>";
-                                for(link in result[kg]["links"]){
-                                  currentLinks += "<li class='list-group-item d-flex justify-content-between align-items-center'>" +
-                                                  result[kg]["links"][link]["target"] + "<span class='badge bg-primary rounded-pill'>" + result[kg]["links"][link]["value"] + "</span>"+
-                                                  "</li>";
-                                }
-                                currentLinks += "</ul></pre>";
-                            }else
-                                currentLinks = "Not present";
-
-                            //sparql formatting section
-                            var sparqlEnd;
-                            if(result[kg]["sparql"] != null){
-                              sparqlEnd = "<div class='list-group'>" +
-                                              "<a href='" + result[kg]["sparql"]["access_url"] + "' class='list-group-item list-group-item-action'>" +
-                                                "<div class='d-flex w-100 justify-content-between'>" +
-                                                  "<h5 class='mb-1'>SPARQL Endpoint</h5>" +
-                                                  "<span class='badge bg-primary rounded-pill'>" + result[kg]["sparql"]["status"] + "</span>"+
-                                                "</div>" +
-                                                "<p class='mb-1'>" +  result[kg]["sparql"]["description"] + "</p>" +
-                                                "<small>" + result[kg]["sparql"]["access_url"] + "</small>" +
-                                              "</a>" + 
-                                            "</div>";
-                            }else
-                              sparqlEnd = "<div class='list-group'>" +
-                                              "<a class='list-group-item list-group-item-action'>" +
-                                                "<div class='d-flex w-100 justify-content-between'>" +
-                                                  "<h5 class='mb-1'>SPARQL Endpoint</h5>" +
-                                                "</div>" +
-                                                "<p class='mb-1'>Not Present</p>" +
-                                              "</a>" + 
-                                            "</div>";
-                            
-                              //general accordion formatting section              
-                              $("#accordionPanels").append("<div clas s='accordion-item'>" +
-                                                              "<h2 class='accordion-header' id='panelsStayOpen-heading" + i + "''>" +
-                                                                  "<button class='accordion-button collapsed' type='button' data-bs-toggle='collapse' data-bs-target='#panelsStayOpen-collapse"+i+"' aria-expanded='false' aria-controls='panelsStayOpen-collapse"+i+"'>" +
-                                                                  "#"+i+"__<strong>" + result[kg]["title"] + "</strong>" +
-                                                                  "</button>" +
-                                                              "</h2>" + 
-                                                              "<div id='panelsStayOpen-collapse"+i+"' class='accordion-collapse collapse' aria-labelledby='panelsStayOpen-heading"+i+"'>" +
-                                                                  "<div class='accordion-body'>" +
-                                                                      "<strong>Id: </strong>" + result[kg]["id"] +
-                                                                      "<br><strong>Description: </strong>" + result[kg]["description"] +
-                                                                      "<br><strong>Website: </strong><a href='" + result[kg]["website"] + "'>" + result[kg]["website"] + "</a>" + 
-                                                                      "<br><strong>Triples: </strong>" + result[kg]["triples"] +
-                                                                      "<br><strong>Keywords: </strong>" + currentKeywords +
-                                                                      "<strong>Links: </strong>" + currentLinks +
-                                                                      "<br><br>" + sparqlEnd +
-                                                                  "</div>" +
-                                                              "</div>" +
-                                                          "</div>");
-                              i++;
+                          // keywords formatting section
+                          /*
+                          var currentKeywords = "<pre><ul class='list-group list-group-horizontal'>";
+                          for(key in result[kg]["keywords"]){
+                            currentKeywords += "<li class='list-group-item' style='color:grey;'>" + result[kg]["keywords"][key] + "</li>";
                           }
-                      }
-                  })
+                          currentKeywords += "</ul></pre>" */
 
-                }
-            })
+                          var currentKeywords  = "<pre>"
+                          for(key in result[kg]["keywords"]){
+                            currentKeywords += "<span class='badge rounded-pill bg-secondary'>" + result[kg]["keywords"][key] + "</span>"
+                          }
+                          currentKeywords += "</pre>";
+
+                          //links formatting section
+                          var currentLinks;
+                          if(result[kg]["links"] != ""){
+                              currentLinks = "<pre><ul class='list-group'>";
+                              for(link in result[kg]["links"]){
+                                currentLinks += "<li class='list-group-item d-flex justify-content-between align-items-center'>" +
+                                                result[kg]["links"][link]["target"] + "<span class='badge bg-primary rounded-pill'>" + result[kg]["links"][link]["value"] + "</span>"+
+                                                "</li>";
+                              }
+                              currentLinks += "</ul></pre>";
+                          }else
+                              currentLinks = "Not present";
+
+                          //sparql formatting section
+                          var sparqlEnd;
+                          if(result[kg]["sparql"] != null){
+                            sparqlEnd = "<div class='list-group'>" +
+                                            "<a href='" + result[kg]["sparql"]["access_url"] + "' class='list-group-item list-group-item-action'>" +
+                                              "<div class='d-flex w-100 justify-content-between'>" +
+                                                "<h5 class='mb-1'>SPARQL Endpoint</h5>" +
+                                                "<span class='badge bg-primary rounded-pill'>" + result[kg]["sparql"]["status"] + "</span>"+
+                                              "</div>" +
+                                              "<p class='mb-1'>" +  result[kg]["sparql"]["description"] + "</p>" +
+                                              "<small>" + result[kg]["sparql"]["access_url"] + "</small>" +
+                                            "</a>" + 
+                                          "</div>";
+                          }else
+                            sparqlEnd = "<div class='list-group'>" +
+                                            "<a class='list-group-item list-group-item-action'>" +
+                                              "<div class='d-flex w-100 justify-content-between'>" +
+                                                "<h5 class='mb-1'>SPARQL Endpoint</h5>" +
+                                              "</div>" +
+                                              "<p class='mb-1'>Not Present</p>" +
+                                            "</a>" + 
+                                          "</div>";
+                          
+                            //general accordion formatting section              
+                            $("#accordionPanels").append("<div clas s='accordion-item'>" +
+                                                            "<h2 class='accordion-header' id='panelsStayOpen-heading" + i + "''>" +
+                                                                "<button class='accordion-button collapsed' type='button' data-bs-toggle='collapse' data-bs-target='#panelsStayOpen-collapse"+i+"' aria-expanded='false' aria-controls='panelsStayOpen-collapse"+i+"'>" +
+                                                                "#"+i+"__<strong>" + result[kg]["title"] + "</strong>" +
+                                                                "</button>" +
+                                                            "</h2>" + 
+                                                            "<div id='panelsStayOpen-collapse"+i+"' class='accordion-collapse collapse' aria-labelledby='panelsStayOpen-heading"+i+"'>" +
+                                                                "<div class='accordion-body'>" +
+                                                                    "<strong>Id: </strong>" + result[kg]["id"] +
+                                                                    "<br><strong>Description: </strong>" + result[kg]["description"] +
+                                                                    "<br><strong>Website: </strong><a href='" + result[kg]["website"] + "'>" + result[kg]["website"] + "</a>" + 
+                                                                    "<br><strong>Triples: </strong>" + result[kg]["triples"] +
+                                                                    "<br><strong>Keywords: </strong>" + currentKeywords +
+                                                                    "<strong>Links: </strong>" + currentLinks +
+                                                                    "<br><br>" + sparqlEnd +
+                                                                "</div>" +
+                                                            "</div>" +
+                                                        "</div>");
+                            i++;
+                        }
+                    }
+                })
+
+              }
+          })
         })
     </script>
 
     <title>KG Search Engine</title>
   </head>
-  
+
   <body>
     <!-- Option 1: Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
@@ -120,7 +134,7 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-              <a class="nav-link active" aria-current="page" href="#">Home</a>
+              <a class="nav-link active" aria-current="page" href="http://localhost:8080">Home</a>
               <a class="nav-link" href="#">Features</a>
               <a class="nav-link" href="#">About</a>
               
@@ -136,6 +150,52 @@
             <input id="searchValue" type="text" class="form-control" placeholder="Knowledge Graph keyword"  aria-describedby="button-addon2">
             <button class="btn btn-outline-secondary" type="button" id="searchButton">Search</button>
         </div>
+
+        <form id="rankingForm">
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="rankingOptions" id="radioAlph" value="name" checked>
+            <label class="form-check-label" for="radioSize">Alphabetic</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="rankingOptions" id="radioSize" value="size">
+            <label class="form-check-label" for="radioSize">Size</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="rankingOptions" id="radioAuth" value="authority">
+            <label class="form-check-label" for="radioAuth">Authority</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="rankingOptions" id="radioCentr" value="centrality">
+            <label class="form-check-label" for="radioCentr">Centrality</label>
+          </div>
+        </form><br>
+
+        <form id="tagForm">
+          <input type="checkbox" class="btn-check" name="tagSelection" id="checkId" autocomplete="off" value="id">
+          <label class="btn btn-outline-primary" for="checkId">id</label>
+
+          <input type="checkbox" class="btn-check" name="tagSelection" id="checkTitle" autocomplete="off" value="title">
+          <label class="btn btn-outline-primary" for="checkTitle">title</label>
+
+          <input type="checkbox" class="btn-check" name="tagSelection" id="checkDescription" autocomplete="off" value="description">
+          <label class="btn btn-outline-primary" for="checkDescription">description</label>
+
+          <input type="checkbox" class="btn-check" name="tagSelection" id="checkWebsite" autocomplete="off" value="website">
+          <label class="btn btn-outline-primary" for="checkWebsite">website</label>
+
+          <input type="checkbox" class="btn-check" name="tagSelection" id="checkTriples" autocomplete="off" value="triples">
+          <label class="btn btn-outline-primary" for="checkTriples">triples</label>
+
+          <input type="checkbox" class="btn-check" name="tagSelection" id="checkKeywords" autocomplete="off" value="keywords">
+          <label class="btn btn-outline-primary" for="checkKeywords">keywords</label>
+
+          <input type="checkbox" class="btn-check" name="tagSelection" id="checkLinks" autocomplete="off" value="links">
+          <label class="btn btn-outline-primary" for="checkLinks">links</label>
+
+          <input type="checkbox" class="btn-check" name="tagSelection" id="checkSparql" autocomplete="off" value="sparql">
+          <label class="btn btn-outline-primary" for="checkSparql">sparql</label>
+
+        </form>
 
     </div>
 

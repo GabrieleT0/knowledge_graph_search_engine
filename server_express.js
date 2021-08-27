@@ -24,7 +24,8 @@ app.get('/brutalSearch', (req, res) => {
     const myURL = new URL(req.url, 'https://127.0.0.1:'+PORT);
     console.log(myURL);
     var keyword = myURL.searchParams.get('keyword');
-    var results = querier.brutalSearch(keyword);
+    var rankingMode = myURL.searchParams.get('rankBy');
+    var results = querier.brutalSearch(keyword, rankingMode);
     console.log(keyword);
     //per adesso inviamo la stessa key inserita, in seguito 
     // i risultati della ricerca su lod cloud/datahub o un aggregato di entrambi
