@@ -20,33 +20,28 @@
           });*/
             
           $("#searchButton").click(function(){
+              var path;
               var target = $('#searchValue').val();
               var rankingMode = $('input[name=rankingOptions]:checked', '#rankingForm').val();
 
               var tags = new Array();
               $.each($("input[name='tagSelection']:checked"), function() {
                 tags.push($(this).val());
-                // or you can do something to the actual checked checkboxes by working directly with  'this'
-                // something like $(this).hide() (only something useful, probably) :P
               });
 
-              console.log(rankingMode);
+              if(tags == '')
+                path = 'brutalSearch';
+              else
+                path = 'multiTagSearch';
+
               if(target != ''){
                 $("#accordionPanels").html("");
 
                 $.ajax({
-                    url: "/brutalSearch?keyword="+target+"&rankBy="+rankingMode,
+                    url: "/"+path+"?keyword="+target+"&rankBy="+rankingMode+"&tags="+tags,
                     success: function(result){
                         var i = 0;
                         for(kg in result){
-
-                          // keywords formatting section
-                          /*
-                          var currentKeywords = "<pre><ul class='list-group list-group-horizontal'>";
-                          for(key in result[kg]["keywords"]){
-                            currentKeywords += "<li class='list-group-item' style='color:grey;'>" + result[kg]["keywords"][key] + "</li>";
-                          }
-                          currentKeywords += "</ul></pre>" */
 
                           var currentKeywords  = "<pre>"
                           for(key in result[kg]["keywords"]){

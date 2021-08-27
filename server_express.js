@@ -19,14 +19,27 @@ app.get('/', (req, res) => {
 
 //serviamo la ricerca brutale della keyword inserita (può essere anche un'espressione regolare)
 app.get('/brutalSearch', (req, res) => {
-    console.log('devo cercare una keyword');
+    console.log('brutalSearch(express)');
     //url formatting
     const myURL = new URL(req.url, 'https://127.0.0.1:'+PORT);
     console.log(myURL);
     var keyword = myURL.searchParams.get('keyword');
     var rankingMode = myURL.searchParams.get('rankBy');
     var results = querier.brutalSearch(keyword, rankingMode);
-    console.log(keyword);
+    //per adesso inviamo la stessa key inserita, in seguito 
+    // i risultati della ricerca su lod cloud/datahub o un aggregato di entrambi
+    res.json(results);
+});
+
+app.get('/multiTagSearch', (req, res) => {
+    console.log('multiTagSearch(express');
+    //url formatting
+    const myURL = new URL(req.url, 'https://127.0.0.1:'+PORT);
+    console.log(myURL);
+    var keyword = myURL.searchParams.get('keyword');
+    var rankingMode = myURL.searchParams.get('rankBy');
+    var tags = myURL.searchParams.get('tags').split(',');
+    var results = querier.multiTagSearch(keyword, ...tags, rankingMode);
     //per adesso inviamo la stessa key inserita, in seguito 
     // i risultati della ricerca su lod cloud/datahub o un aggregato di entrambi
     res.json(results);
