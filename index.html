@@ -24,11 +24,47 @@
                     success: function(result){
                         var i = 0;
                         for(kg in result){
+
                             var currentKeywords = "<pre><ul class='list-group list-group-horizontal'>";
                             for(key in result[kg]["keywords"]){
                               currentKeywords += "<li class='list-group-item' style='color:grey;'>" + result[kg]["keywords"][key] + "</li>";
                             }
                             currentKeywords += "</ul></pre>"
+
+                            var currentLinks;
+                            if(result[kg]["links"] != ""){
+                                currentLinks = "<pre><ul class='list-group'>";
+                                for(link in result[kg]["links"]){
+                                  currentLinks += "<li class='list-group-item d-flex justify-content-between align-items-center'>" +
+                                                  result[kg]["links"][link]["target"] + "<span class='badge bg-primary rounded-pill'>" + result[kg]["links"][link]["value"] + "</span>"+
+                                                  "</li>";
+                                }
+                                currentLinks += "</ul></pre>";
+                            }else
+                                currentLinks = "Not present";
+
+                            var sparqlEnd;
+                            if(result[kg]["sparql"] != null){
+                              sparqlEnd = "<div class='list-group'>" +
+                                              "<a href='" + result[kg]["sparql"]["access_url"] + "' class='list-group-item list-group-item-action'>" +
+                                                "<div class='d-flex w-100 justify-content-between'>" +
+                                                  "<h5 class='mb-1'>SPARQL Endpoint</h5>" +
+                                                  "<span class='badge bg-primary rounded-pill'>" + result[kg]["sparql"]["status"] + "</span>"+
+                                                "</div>" +
+                                                "<p class='mb-1'>" +  result[kg]["sparql"]["description"] + "</p>" +
+                                                "<small>" + result[kg]["sparql"]["access_url"] + "</small>" +
+                                              "</a>" + 
+                                            "</div>";
+                            }else
+                              sparqlEnd = "<div class='list-group'>" +
+                                              "<a class='list-group-item list-group-item-action'>" +
+                                                "<div class='d-flex w-100 justify-content-between'>" +
+                                                  "<h5 class='mb-1'>SPARQL Endpoint</h5>" +
+                                                "</div>" +
+                                                "<p class='mb-1'>Not Present</p>" +
+                                              "</a>" + 
+                                            "</div>";
+                            
                               $("#accordionPanels").append("<div clas s='accordion-item'>" +
                                                               "<h2 class='accordion-header' id='panelsStayOpen-heading" + i + "''>" +
                                                                   "<button class='accordion-button collapsed' type='button' data-bs-toggle='collapse' data-bs-target='#panelsStayOpen-collapse"+i+"' aria-expanded='false' aria-controls='panelsStayOpen-collapse"+i+"'>" +
@@ -42,7 +78,8 @@
                                                                       "<br><strong>Website: </strong><a href='" + result[kg]["website"] + "'>" + result[kg]["website"] + "</a>" + 
                                                                       "<br><strong>Triples: </strong>" + result[kg]["triples"] +
                                                                       "<br><strong>Keywords: </strong>" + currentKeywords +
-                                                                      "<br><strong>Links: </strong><pre>" + JSON.stringify(result[kg]["links"]) + "</pre>" +
+                                                                      "<strong>Links: </strong>" + currentLinks +
+                                                                      "<br><br>" + sparqlEnd +
                                                                   "</div>" +
                                                               "</div>" +
                                                           "</div>");
@@ -101,3 +138,7 @@
 
   </body>
 </html>
+
+
+
+
