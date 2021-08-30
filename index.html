@@ -11,13 +11,12 @@
     <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
+    <style>
+      #more {display: none;}
+    </style>
+
     <script>
         $(document).ready(function(){
-          
-          /*
-          $('#rankingForm input').on('change', function() {
-            alert($('input[name=rankingOptions]:checked', '#rankingForm').val()); 
-          });*/
             
           $("#searchButton").click(function(){
               var path;
@@ -40,9 +39,20 @@
                 $.ajax({
                     url: "/"+path+"?keyword="+target+"&rankBy="+rankingMode+"&tags="+tags,
                     success: function(result){
+
                         var i = 0;
                         for(kg in result){
 
+                          //description formatting
+                          var currDescription = '<p>';                            
+                          if(JSON.stringify(result[kg]["description"]).length > 600){
+                            currDescription += result[kg]["description"].slice(0, 600) + 
+                                               "<span id='dots" + i + "'>...</span><span style='display: none;' id='more" + i + "'>" + 
+                                               result[kg]["description"].slice(600) + "</span><button type='button' class='btn btn-link' onclick='collapseDescription(" + i + ")' id='myBtn" + i + "'>Read more</button></p>";                            
+                          }else
+                            currDescription += result[kg]["description"] + "</p>";
+
+                          //keywords formatting section
                           var currentKeywords  = "<pre>"
                           for(key in result[kg]["keywords"]){
                             currentKeywords += "<span class='badge rounded-pill bg-secondary'>" + result[kg]["keywords"][key] + "</span>"
@@ -95,7 +105,7 @@
                                                             "<div id='panelsStayOpen-collapse"+i+"' class='accordion-collapse collapse' aria-labelledby='panelsStayOpen-heading"+i+"'>" +
                                                                 "<div class='accordion-body'>" +
                                                                     "<strong>Id: </strong>" + result[kg]["id"] +
-                                                                    "<br><strong>Description: </strong>" + result[kg]["description"] +
+                                                                    "<br><strong>Description: </strong>" + currDescription +
                                                                     "<br><strong>Website: </strong><a href='" + result[kg]["website"] + "'>" + result[kg]["website"] + "</a>" + 
                                                                     "<br><strong>Triples: </strong>" + result[kg]["triples"] +
                                                                     "<br><strong>Keywords: </strong>" + currentKeywords +
@@ -112,6 +122,37 @@
               }
           })
         })
+
+
+        //funzione filtro per restituire solo i kgs con sparql end e links (bisogna lavorarci)
+        function cleanDatasets(results){
+          var cleanedOnes = JSON.parse('[]');
+          var i = 0;
+
+          for(ds in results){
+            if(results[ds]["links"] != "" && results[ds]["sparql"] != null)
+              cleanedOnes[i++] = results[ds];
+          }
+
+          return cleanedOnes;
+        }
+
+        //funzione per collassare le descriptions
+        function collapseDescription(i) {
+          var dots = $('#dots'+i)[0];                    
+          var moreText = $('#more'+i)[0];
+          var btnText = $('#myBtn'+i)[0];
+
+          if (dots.style.display === "none") {
+            dots.style.display = "inline";
+            btnText.innerHTML = "Read more"; 
+            moreText.style.display = "none";
+          } else {
+            dots.style.display = "none";
+            btnText.innerHTML = "Read less"; 
+            moreText.style.display = "inline";
+          }
+        }
     </script>
 
     <title>KG Search Engine</title>
@@ -138,8 +179,8 @@
         </div>
     </nav>
 
-    <div class="container my-5" style="max-width: 500px;">
-        <h3>Quì puoi inserire la keyword...</h3>
+    <div class="container my-5" style="max-width: 700px;">
+        <h3>Enter a keyword...</h3>
         <div class="input-group mb-3">
             <form></form>
             <input id="searchValue" type="text" class="form-control" placeholder="Knowledge Graph keyword"  aria-describedby="button-addon2">
