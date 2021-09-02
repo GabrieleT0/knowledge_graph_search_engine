@@ -29,6 +29,7 @@ app.get('/brutalSearch', (req, res) => {
     //per adesso inviamo la stessa key inserita, in seguito 
     // i risultati della ricerca su lod cloud/datahub o un aggregato di entrambi
     res.json(results);
+    writeFile(results);
 });
 
 app.get('/multiTagSearch', (req, res) => {
@@ -43,8 +44,23 @@ app.get('/multiTagSearch', (req, res) => {
     //per adesso inviamo la stessa key inserita, in seguito 
     // i risultati della ricerca su lod cloud/datahub o un aggregato di entrambi
     res.json(results);
+    writeFile(results);
 });
+
+app.get('/results.json', (req, res) => {
+    console.log('mi hanno chiesto di scaricare i risultati ');    
+    res.download('results.json');
+})
 
 app.listen(PORT, function(){
     console.log('sono in ascolto sulla porta 8080');
 });
+
+function writeFile(results){
+    fs.writeFile("results.json", JSON.stringify(results, null, 2), function(err) {
+        if(err) {
+            return console.log(err);
+        }
+        console.log("results.json was saved");
+    });
+}

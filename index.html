@@ -187,6 +187,8 @@
             <button class="btn btn-outline-secondary" type="button" id="searchButton">Search</button>
         </div>
 
+
+        <small class="text-muted">Choose the sort order</small>
         <form id="rankingForm">
           <div class="form-check form-check-inline">
             <input class="form-check-input" type="radio" name="rankingOptions" id="radioAlph" value="name" checked>
@@ -204,8 +206,9 @@
             <input class="form-check-input" type="radio" name="rankingOptions" id="radioCentr" value="centrality">
             <label class="form-check-label" for="radioCentr">Centrality</label>
           </div>
-        </form><br>
+        </form>
 
+        <small class="text-muted">Focus the search only on the selected tags..</small>
         <form id="tagForm">
           <input type="checkbox" class="btn-check" name="tagSelection" id="checkId" autocomplete="off" value="id">
           <label class="btn btn-outline-primary" for="checkId">id</label>
@@ -234,6 +237,8 @@
         </form>
 
     </div>
+    
+    <a href="results.json" download>Download</a>
 
     <div class="container-fluid my-5" style="max-width: 1000px;">
 
@@ -242,14 +247,8 @@
             
         </div>
         
-    </div>
-
-    
+    </div>   
     
 
   </body>
 </html>
-
-
-
-
