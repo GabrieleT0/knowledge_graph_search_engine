@@ -12,7 +12,10 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <style>
-      #more {display: none;}
+      ul {
+          width: 80%;
+          margin: auto;
+      }
     </style>
 
     <script>
@@ -35,87 +38,141 @@
 
               if(target != ''){
                 $("#accordionPanels").html("");
+                $("#analyticsPanel").html("");
 
                 $.ajax({
                     url: "/"+path+"?keyword="+target+"&rankBy="+rankingMode+"&tags="+tags,
                     success: function(result){
 
-                        var i = 0;
-                        for(kg in result){
+                      //analyticsPanel formatting
+                      $("#analyticsPanel").html("<div class='card'>" +
+                                                  "<h5 class='card-header'>Resume</h5>" + 
+                                                  "<div class='card-body'>" +
+                                                    "<ul class='nav nav-pills mb-3' id='pills-tab' role='tablist'>" +
+                                                      "<li class='nav-item' role='presentation'>" +
+                                                        "<button class='nav-link active' id='pills-home-tab' data-bs-toggle='pill' data-bs-target='#pills-home' type='button' role='tab' aria-controls='pills-home' aria-selected='true'>Keyword</button>" +
+                                                      "</li>" +
+                                                      "<li class='nav-item' role='presentation'>" +
+                                                        "<button class='nav-link' id='pills-profile-tab' data-bs-toggle='pill' data-bs-target='#pills-profile' type='button' role='tab' aria-controls='pills-profile' aria-selected='false'>Ranking</button>" +
+                                                      "</li>" +
+                                                      "<li class='nav-item' role='presentation'>" +
+                                                        "<button class='nav-link' id='pills-contact-tab' data-bs-toggle='pill' data-bs-target='#pills-contact' type='button' role='tab' aria-controls='pills-contact' aria-selected='false'>Search Mode</button>" +
+                                                      "</li>" +
+                                                      "<li class='nav-item' role='presentation'>" +
+                                                        "<button class='nav-link' id='new-pills-tab' data-bs-toggle='pill' data-bs-target='#numOfResults' type='button' role='tab' aria-controls='numOfResults' aria-selected='false'>Num of Results</button>" +
+                                                      "</li>" +
+                                                    "</ul>" +
+                                                    "<div class='tab-content' id='pills-tabContent'>" +
+                                                      "<div class='tab-pane fade show active text-center' id='pills-home' role='tabpanel' aria-labelledby='pills-home-tab'><h5><strong>" + target + "</strong> which is interpreted as the following regular expression: <strong>/" + target + "/i</strong></h5></div>" +
+                                                      "<div class='tab-pane fade text-center' id='pills-profile' role='tabpanel' aria-labelledby='pills-profile-tab'><h5>" + rankingMode + "</h5></div>" +
+                                                      "<div class='tab-pane fade text-center' id='pills-contact' role='tabpanel' aria-labelledby='pills-contact-tab'><h5>" + path + "</h5></div>" +
+                                                      "<div class='tab-pane fade text-center' id='numOfResults' role='tabpanel' aria-labelledby='new-pills-tab'><h5>" + Object.keys(result).length + "</h5></div>" +
+                                                    "</div>" +
+                                                  "</div>" +
+                                                  "<div class='card-footer text-muted text-center'><a href='results.json' class='btn btn-primary' download>Download</a></div>" +
+                                                "</div>");
 
-                          //description formatting
-                          var currDescription = '<p>';                            
-                          if(JSON.stringify(result[kg]["description"]).length > 600){
-                            currDescription += result[kg]["description"].slice(0, 600) + 
-                                               "<span id='dots" + i + "'>...</span><span style='display: none;' id='more" + i + "'>" + 
-                                               result[kg]["description"].slice(600) + "</span><button type='button' class='btn btn-link' onclick='collapseDescription(" + i + ")' id='myBtn" + i + "'>Read more</button></p>";                            
-                          }else
-                            currDescription += result[kg]["description"] + "</p>";
 
-                          //keywords formatting section
-                          var currentKeywords  = "<pre>"
-                          for(key in result[kg]["keywords"]){
-                            currentKeywords += "<span class='badge rounded-pill bg-secondary'>" + result[kg]["keywords"][key] + "</span>"
-                          }
-                          currentKeywords += "</pre>";
+                      /*
+                      $("#analyticsPanel").html("<div class='card'>" +
+                                                  "<h5 class='card-header'>Resume</h5>" + 
+                                                  "<div class='card-body'>" +
+                                                    "<div class='d-flex align-items-start'>" + 
+                                                      "<div class='nav flex-column nav-pills me-3' id='v-pills-tab' role='tablist' aria-orientation='vertical'>" +
+                                                        "<button class='nav-link active' id='v-pills-home-tab' data-bs-toggle='pill' data-bs-target='#v-pills-home' type='button' role='tab' aria-controls='v-pills-home' aria-selected='true'>Keyword</button>" +
+                                                        "<button class='nav-link' id='v-pills-profile-tab' data-bs-toggle='pill' data-bs-target='#v-pills-profile' type='button' role='tab' aria-controls='v-pills-profile' aria-selected='false'>Ranking</button>" +
+                                                        "<button class='nav-link' id='v-pills-messages-tab' data-bs-toggle='pill' data-bs-target='#v-pills-messages' type='button' role='tab' aria-controls='v-pills-messages' aria-selected='false'>Search Mode</button>" + 
+                                                        "<button class='nav-link' id='v-pills-settings-tab' data-bs-toggle='pill' data-bs-target='#v-pills-settings' type='button' role='tab' aria-controls='v-pills-settings' aria-selected='false'>Num of Results</button>" +
+                                                      "</div>" +
+                                                      "<div class='tab-content' id='v-pills-tabContent'>" +
+                                                        "<div class='tab-pane fade show active' id='v-pills-home' role='tabpanel' aria-labelledby='v-pills-home-tab'><h5><strong>" + target + "</strong> which is interpreted as the following regular expression: <strong>/" + target + "/i</strong></h5></div>" +
+                                                        "<div class='tab-pane fade' id='v-pills-profile' role='tabpanel' aria-labelledby='v-pills-profile-tab'><h5>" + rankingMode + "</h5></div>" +
+                                                        "<div class='tab-pane fade' id='v-pills-messages' role='tabpanel' aria-labelledby='v-pills-messages-tab'><h5>" + path + "</h5></div>" +
+                                                        "<div class='tab-pane fade' id='v-pills-settings' role='tabpanel' aria-labelledby='v-pills-settings-tab'><h5>" + Object.keys(result).length + "</h5></div>" +
+                                                      "</div>" +
+                                                    "</div>" +
+                                                    "<div class='text-end'><a href='results.json' class='btn btn-primary' download>Download</a></div>" + 
+                                                  "</div>" +
+                                                "</div>");
+                      */
 
-                          //links formatting section
-                          var currentLinks;
-                          if(result[kg]["links"] != ""){
-                              currentLinks = "<pre><ul class='list-group'>";
-                              for(link in result[kg]["links"]){
-                                currentLinks += "<li class='list-group-item d-flex justify-content-between align-items-center'>" +
-                                                result[kg]["links"][link]["target"] + "<span class='badge bg-primary rounded-pill'>" + result[kg]["links"][link]["value"] + "</span>"+
-                                                "</li>";
-                              }
-                              currentLinks += "</ul></pre>";
-                          }else
-                              currentLinks = "Not present";
+                     
+                      var i = 1;
+                      for(kg in result){
 
-                          //sparql formatting section
-                          var sparqlEnd;
-                          if(result[kg]["sparql"] != null){
-                            sparqlEnd = "<div class='list-group'>" +
-                                            "<a href='" + result[kg]["sparql"]["access_url"] + "' class='list-group-item list-group-item-action'>" +
-                                              "<div class='d-flex w-100 justify-content-between'>" +
-                                                "<h5 class='mb-1'>SPARQL Endpoint</h5>" +
-                                                "<span class='badge bg-primary rounded-pill'>" + result[kg]["sparql"]["status"] + "</span>"+
-                                              "</div>" +
-                                              "<p class='mb-1'>" +  result[kg]["sparql"]["description"] + "</p>" +
-                                              "<small>" + result[kg]["sparql"]["access_url"] + "</small>" +
-                                            "</a>" + 
-                                          "</div>";
-                          }else
-                            sparqlEnd = "<div class='list-group'>" +
-                                            "<a class='list-group-item list-group-item-action'>" +
-                                              "<div class='d-flex w-100 justify-content-between'>" +
-                                                "<h5 class='mb-1'>SPARQL Endpoint</h5>" +
-                                              "</div>" +
-                                              "<p class='mb-1'>Not Present</p>" +
-                                            "</a>" + 
-                                          "</div>";
-                          
-                            //general accordion formatting section              
-                            $("#accordionPanels").append("<div clas s='accordion-item'>" +
-                                                            "<h2 class='accordion-header' id='panelsStayOpen-heading" + i + "''>" +
-                                                                "<button class='accordion-button collapsed' type='button' data-bs-toggle='collapse' data-bs-target='#panelsStayOpen-collapse"+i+"' aria-expanded='false' aria-controls='panelsStayOpen-collapse"+i+"'>" +
-                                                                "#"+i+"__<strong>" + result[kg]["title"] + "</strong>" +
-                                                                "</button>" +
-                                                            "</h2>" + 
-                                                            "<div id='panelsStayOpen-collapse"+i+"' class='accordion-collapse collapse' aria-labelledby='panelsStayOpen-heading"+i+"'>" +
-                                                                "<div class='accordion-body'>" +
-                                                                    "<strong>Id: </strong>" + result[kg]["id"] +
-                                                                    "<br><strong>Description: </strong>" + currDescription +
-                                                                    "<br><strong>Website: </strong><a href='" + result[kg]["website"] + "'>" + result[kg]["website"] + "</a>" + 
-                                                                    "<br><strong>Triples: </strong>" + result[kg]["triples"] +
-                                                                    "<br><strong>Keywords: </strong>" + currentKeywords +
-                                                                    "<strong>Links: </strong>" + currentLinks +
-                                                                    "<br><br>" + sparqlEnd +
-                                                                "</div>" +
-                                                            "</div>" +
-                                                        "</div>");
-                            i++;
+                        //description formatting
+                        var currDescription = '<p>';                            
+                        if(JSON.stringify(result[kg]["description"]).length > 600){
+                          currDescription += result[kg]["description"].slice(0, 600) + 
+                                              "<span id='dots" + i + "'>...</span><span style='display: none;' id='more" + i + "'>" + 
+                                              result[kg]["description"].slice(600) + "</span><button type='button' class='btn btn-link' onclick='collapseDescription(" + i + ")' id='myBtn" + i + "'>Read more</button></p>";                            
+                        }else
+                          currDescription += result[kg]["description"] + "</p>";
+
+                        //keywords formatting section
+                        var currentKeywords  = "<pre>"
+                        for(key in result[kg]["keywords"]){
+                          currentKeywords += "<span class='badge rounded-pill bg-secondary'>" + result[kg]["keywords"][key] + "</span>"
                         }
+                        currentKeywords += "</pre>";
+
+                        //links formatting section
+                        var currentLinks;
+                        if(result[kg]["links"] != ""){
+                            currentLinks = "<pre><ul class='list-group'>";
+                            for(link in result[kg]["links"]){
+                              currentLinks += "<li class='list-group-item d-flex justify-content-between align-items-center'>" +
+                                              result[kg]["links"][link]["target"] + "<span class='badge bg-primary rounded-pill'>" + result[kg]["links"][link]["value"] + "</span>"+
+                                              "</li>";
+                            }
+                            currentLinks += "</ul></pre>";
+                        }else
+                            currentLinks = "Not present";
+
+                        //sparql formatting section
+                        var sparqlEnd;
+                        if(result[kg]["sparql"] != null){
+                          sparqlEnd = "<div class='list-group'>" +
+                                          "<a href='" + result[kg]["sparql"]["access_url"] + "' class='list-group-item'>" +
+                                            "<div class='d-flex w-100 justify-content-between'>" +
+                                              "<h5 class='mb-1'>SPARQL Endpoint</h5>" +
+                                              "<span class='badge bg-primary rounded-pill'>" + result[kg]["sparql"]["status"] + "</span>"+
+                                            "</div>" +
+                                            "<p class='mb-1'>" +  result[kg]["sparql"]["description"] + "</p>" +
+                                            "<small>" + result[kg]["sparql"]["access_url"] + "</small>" +
+                                          "</a>" + 
+                                        "</div>";
+                        }else
+                          sparqlEnd = "<div class='list-group'>" +
+                                          "<a class='list-group-item'>" +
+                                            "<div class='d-flex w-100 justify-content-between'>" +
+                                              "<h5 class='mb-1'>SPARQL Endpoint</h5>" +
+                                            "</div>" +
+                                            "<p class='mb-1'>Not Present</p>" +
+                                          "</a>" + 
+                                        "</div>";
+                        
+                          //general accordion formatting section              
+                          $("#accordionPanels").append("<div clas s='accordion-item'>" +
+                                                          "<h2 class='accordion-header' id='panelsStayOpen-heading" + i + "''>" +
+                                                              "<button class='accordion-button collapsed' type='button' data-bs-toggle='collapse' data-bs-target='#panelsStayOpen-collapse"+i+"' aria-expanded='false' aria-controls='panelsStayOpen-collapse"+i+"'>" +
+                                                              "#"+i+"__<strong>" + result[kg]["title"] + "</strong>" +
+                                                              "</button>" +
+                                                          "</h2>" + 
+                                                          "<div id='panelsStayOpen-collapse"+i+"' class='accordion-collapse collapse' aria-labelledby='panelsStayOpen-heading"+i+"'>" +
+                                                              "<div class='accordion-body'>" +
+                                                                  "<strong>Id: </strong>" + result[kg]["id"] +
+                                                                  "<br><strong>Description: </strong>" + currDescription +
+                                                                  "<br><strong>Website: </strong><a href='" + result[kg]["website"] + "'>" + result[kg]["website"] + "</a>" + 
+                                                                  "<br><strong>Triples: </strong>" + result[kg]["triples"] +
+                                                                  "<br><strong>Keywords: </strong>" + currentKeywords +
+                                                                  "<strong>Links: </strong>" + currentLinks +
+                                                                  "<br><br>" + sparqlEnd +
+                                                              "</div>" +
+                                                          "</div>" +
+                                                      "</div>");
+                          i++;
+                      }
                     }
                 })
 
@@ -236,18 +293,25 @@
 
         </form>
 
-    </div>
-    
-    <a href="results.json" download>Download</a>
+        
+      </div>
+      
+      
+      
+      <div class="container-fluid my-5" style="max-width: 1000px;">
+        
 
-    <div class="container-fluid my-5" style="max-width: 1000px;">
+        <div class="container-fluid my-3" id="analyticsPanel">      
+  
+        </div>
+        
 
         <div class="accordion" id="accordionPanels">
             
             
         </div>
         
-    </div>   
+    </div>      
     
 
   </body>
