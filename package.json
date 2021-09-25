@@ -1,7 +1,27 @@
 {
+  "name": "kgs-search-engine",
+  "version": "0.1.0",
+  "description": "A web app that allows you to find knowledge graphs",
+  "engines":{
+    "node": "14.x"
+  },
+  "main": "server_express.js",
+  "scripts":{
+    "start": "node server_express.js"
+  },
   "dependencies": {
     "express": "^4.17.1",
-    "kgs_results_aggregator": "^0.1.1",
-    "lodcloud-querier": "^0.1.1"
-  }
+    "kgs_results_aggregator": "^0.1.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AntonioGiulio/knowledge_graph_search_engine"
+  },
+  "keywords": [
+    "knowledge graph",
+    "lod-cloud",
+    "datahub",
+    "linked open data",
+    "sparql"
+  ]
 }

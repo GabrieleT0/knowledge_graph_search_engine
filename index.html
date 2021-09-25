@@ -11,13 +11,7 @@
     <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-    <style>
-      ul {
-          width: 80%;
-          margin: auto;
-      }
-    </style>
-
+  
     <script>
         $(document).ready(function(){
             
@@ -46,6 +40,32 @@
 
                       //analyticsPanel formatting
                       $("#analyticsPanel").html("<div class='card'>" +
+                                                  "<h5 class='card-header'>Summary</h5>" +
+                                                  "<div class='card-body'>" +
+                                                    "<table class='table table-sm'>" +
+                                                      "<thead>" +
+                                                        "<tr>" +
+                                                          "<th scope='col'>Keyword</th>" +
+                                                          "<th scope='col'>Ranking</th>" +
+                                                          "<th scope='col'>Search Mode</th>" +
+                                                          "<th scope='col'>Num of Results</th>" +
+                                                        "</tr>" +
+                                                      "</thead>" +
+                                                      "<tbody>" + 
+                                                        "<tr>" +
+                                                          "<td>" + target + "</td>" +
+                                                          "<td>" + rankingMode + "</td>" +
+                                                          "<td>" + path + "</td>" +
+                                                          "<td>" + Object.keys(result).length + "</td>" +
+                                                        "</tr>" +
+                                                      "</tbody>" + 
+                                                    "</table>" +
+                                                  "</div>" +
+                                                  "<div class='card-footer text-muted text-center'><a href='results.json' class='btn btn-primary' download>Download</a></div>" +
+                                                "</div>");
+
+                      /*                         
+                      $("#analyticsPanel").html("<div class='card'>" +
                                                   "<h5 class='card-header'>Resume</h5>" + 
                                                   "<div class='card-body'>" +
                                                     "<ul class='nav nav-pills mb-3' id='pills-tab' role='tablist'>" +
@@ -70,7 +90,7 @@
                                                     "</div>" +
                                                   "</div>" +
                                                   "<div class='card-footer text-muted text-center'><a href='results.json' class='btn btn-primary' download>Download</a></div>" +
-                                                "</div>");
+                                                "</div>");*/
 
 
                       /*
