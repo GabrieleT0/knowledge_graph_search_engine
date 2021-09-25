@@ -5,9 +5,9 @@
   "engines":{
     "node": "14.x"
   },
-  "main": "server_express.js",
+  "main": "index.js",
   "scripts":{
-    "start": "node server_express.js"
+    "start": "node index.js"
   },
   "dependencies": {
     "express": "^4.17.1",
