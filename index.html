@@ -11,6 +11,9 @@
     <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
+    <!-- VivaGraph -->
+    <script type="text/javascript" src="vivagraph.js"></script>
+
   
     <script>
         $(document).ready(function(){
@@ -64,60 +67,9 @@
                                                   "<div class='card-footer text-muted text-center'><a href='results.json' class='btn btn-primary' download>Download</a></div>" +
                                                 "</div>");
 
-                      /*                         
-                      $("#analyticsPanel").html("<div class='card'>" +
-                                                  "<h5 class='card-header'>Resume</h5>" + 
-                                                  "<div class='card-body'>" +
-                                                    "<ul class='nav nav-pills mb-3' id='pills-tab' role='tablist'>" +
-                                                      "<li class='nav-item' role='presentation'>" +
-                                                        "<button class='nav-link active' id='pills-home-tab' data-bs-toggle='pill' data-bs-target='#pills-home' type='button' role='tab' aria-controls='pills-home' aria-selected='true'>Keyword</button>" +
-                                                      "</li>" +
-                                                      "<li class='nav-item' role='presentation'>" +
-                                                        "<button class='nav-link' id='pills-profile-tab' data-bs-toggle='pill' data-bs-target='#pills-profile' type='button' role='tab' aria-controls='pills-profile' aria-selected='false'>Ranking</button>" +
-                                                      "</li>" +
-                                                      "<li class='nav-item' role='presentation'>" +
-                                                        "<button class='nav-link' id='pills-contact-tab' data-bs-toggle='pill' data-bs-target='#pills-contact' type='button' role='tab' aria-controls='pills-contact' aria-selected='false'>Search Mode</button>" +
-                                                      "</li>" +
-                                                      "<li class='nav-item' role='presentation'>" +
-                                                        "<button class='nav-link' id='new-pills-tab' data-bs-toggle='pill' data-bs-target='#numOfResults' type='button' role='tab' aria-controls='numOfResults' aria-selected='false'>Num of Results</button>" +
-                                                      "</li>" +
-                                                    "</ul>" +
-                                                    "<div class='tab-content' id='pills-tabContent'>" +
-                                                      "<div class='tab-pane fade show active text-center' id='pills-home' role='tabpanel' aria-labelledby='pills-home-tab'><h5><strong>" + target + "</strong> which is interpreted as the following regular expression: <strong>/" + target + "/i</strong></h5></div>" +
-                                                      "<div class='tab-pane fade text-center' id='pills-profile' role='tabpanel' aria-labelledby='pills-profile-tab'><h5>" + rankingMode + "</h5></div>" +
-                                                      "<div class='tab-pane fade text-center' id='pills-contact' role='tabpanel' aria-labelledby='pills-contact-tab'><h5>" + path + "</h5></div>" +
-                                                      "<div class='tab-pane fade text-center' id='numOfResults' role='tabpanel' aria-labelledby='new-pills-tab'><h5>" + Object.keys(result).length + "</h5></div>" +
-                                                    "</div>" +
-                                                  "</div>" +
-                                                  "<div class='card-footer text-muted text-center'><a href='results.json' class='btn btn-primary' download>Download</a></div>" +
-                                                "</div>");*/
-
-
                       /*
-                      $("#analyticsPanel").html("<div class='card'>" +
-                                                  "<h5 class='card-header'>Resume</h5>" + 
-                                                  "<div class='card-body'>" +
-                                                    "<div class='d-flex align-items-start'>" + 
-                                                      "<div class='nav flex-column nav-pills me-3' id='v-pills-tab' role='tablist' aria-orientation='vertical'>" +
-                                                        "<button class='nav-link active' id='v-pills-home-tab' data-bs-toggle='pill' data-bs-target='#v-pills-home' type='button' role='tab' aria-controls='v-pills-home' aria-selected='true'>Keyword</button>" +
-                                                        "<button class='nav-link' id='v-pills-profile-tab' data-bs-toggle='pill' data-bs-target='#v-pills-profile' type='button' role='tab' aria-controls='v-pills-profile' aria-selected='false'>Ranking</button>" +
-                                                        "<button class='nav-link' id='v-pills-messages-tab' data-bs-toggle='pill' data-bs-target='#v-pills-messages' type='button' role='tab' aria-controls='v-pills-messages' aria-selected='false'>Search Mode</button>" + 
-                                                        "<button class='nav-link' id='v-pills-settings-tab' data-bs-toggle='pill' data-bs-target='#v-pills-settings' type='button' role='tab' aria-controls='v-pills-settings' aria-selected='false'>Num of Results</button>" +
-                                                      "</div>" +
-                                                      "<div class='tab-content' id='v-pills-tabContent'>" +
-                                                        "<div class='tab-pane fade show active' id='v-pills-home' role='tabpanel' aria-labelledby='v-pills-home-tab'><h5><strong>" + target + "</strong> which is interpreted as the following regular expression: <strong>/" + target + "/i</strong></h5></div>" +
-                                                        "<div class='tab-pane fade' id='v-pills-profile' role='tabpanel' aria-labelledby='v-pills-profile-tab'><h5>" + rankingMode + "</h5></div>" +
-                                                        "<div class='tab-pane fade' id='v-pills-messages' role='tabpanel' aria-labelledby='v-pills-messages-tab'><h5>" + path + "</h5></div>" +
-                                                        "<div class='tab-pane fade' id='v-pills-settings' role='tabpanel' aria-labelledby='v-pills-settings-tab'><h5>" + Object.keys(result).length + "</h5></div>" +
-                                                      "</div>" +
-                                                    "</div>" +
-                                                    "<div class='text-end'><a href='results.json' class='btn btn-primary' download>Download</a></div>" + 
-                                                  "</div>" +
-                                                "</div>");
-                      */
-
-                     
                       var i = 1;
+                      // standard style of formatting
                       for(kg in result){
 
                         //description formatting
@@ -192,7 +144,36 @@
                                                           "</div>" +
                                                       "</div>");
                           i++;
+                      }*/
+                      
+                      // (siamo ancora dentro l'ajax l'unico scope dove abbiamo i results con cui dobbiamo costruire il grafo)
+                      // let's try to show the graph
+                      var graph = Viva.Graph.graph();
+
+                      // popoliamo il grafo con i nodi
+                      for(kg in result){
+                        graph.addNode(result[kg].id);
                       }
+                      //aggiungiamo i link tra i nodi del grafo
+                      for(kg in result){
+                        var currKGLinks = result[kg].links;
+                        for(link in currKGLinks){
+                          if(graph.getNode(currKGLinks[link].target) != null){
+                            graph.addLink(result[kg].id, currKGLinks[link].target, currKGLinks[link].value);
+                          }
+                        }
+                      }
+
+                      var graphics = Viva.Graph.View.webglGraphics();
+
+                      var renderer = Viva.Graph.View.renderer(graph,
+                          {
+                              graphics : graphics
+                          });
+                      renderer.run();
+
+                      //var renderer = Viva.Graph.View.renderer(graph);
+                      //renderer.run();                    
                     }
                 })
 
@@ -233,6 +214,10 @@
     </script>
 
     <title>KG Search Engine</title>
+
+    <style type="text/css" media="screen">
+        html, body, svg { width: 100%; height: 100%;}
+    </style>
   </head>
 
   <body>

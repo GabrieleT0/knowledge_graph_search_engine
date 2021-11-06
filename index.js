@@ -1,6 +1,7 @@
 const express = require('express');
 var fs = require('fs');
 var kgs_aggregator = require('kgs_results_aggregator');
+const path = require('path');
 
 const PORT = process.env.PORT || 8080;
 
@@ -51,6 +52,10 @@ app.get('/results.json', (req, res) => {
     console.log('mi hanno chiesto di scaricare i risultati ');    
     res.download('results.json');
 })
+
+app.get('/vivagraph.js', function (req, res, next) {
+    res.sendFile(path.join(__dirname, '/vivagraph.js'))
+  })
 
 app.listen(PORT, function(){
     console.log('sono in ascolto sulla porta 8080');
