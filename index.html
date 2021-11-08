@@ -164,7 +164,36 @@
                         }
                       }
 
-                      var graphics = Viva.Graph.View.webglGraphics();
+                      var graphics = Viva.Graph.View.svgGraphics();
+
+                      graphics.node(function(node){
+                        var radius = 15;
+                        var ui = Viva.Graph.svg("g");
+                        var svgCircle = Viva.Graph.svg('circle')
+                              .attr('cx', radius)
+                              .attr('cy', radius)
+                              .attr('fill', 'red')
+                              .attr('r', radius);           
+                        var svgText = Viva.Graph.svg('text').attr('y', '15px').text("");                     
+                        ui.append(svgCircle);
+                        ui.append(svgText);
+
+                        // qui possiamo fare qualcosa quando passiamo con il  mouse su un nodo 
+                        
+                        $(ui).hover(
+                          function() {
+                            console.log(node.id);         
+                            svgText.text(node.id);
+                          },
+                          function() {
+                            svgText.text("");
+                          }
+                        );
+                        return ui;
+                      })
+                      graphics.placeNode(function(nodeUI, pos){
+                        nodeUI.attr('transform', 'translate(' + (pos.x - 12) + ',' + (pos.y - 12) + ')');
+                      })
 
                       var renderer = Viva.Graph.View.renderer(graph,
                           {
