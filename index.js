@@ -27,8 +27,10 @@ app.get('/brutalSearch', (req, res) => {
     var keyword = myURL.searchParams.get('keyword');
     var rankingMode = myURL.searchParams.get('rankBy');
     var results = querier.brutalSearch(keyword, rankingMode);
-    //per adesso inviamo la stessa key inserita, in seguito 
-    // i risultati della ricerca su lod cloud/datahub o un aggregato di entrambi
+    // for(var kg in results){
+    //     if(results[kg].id == 'revyu')
+    //         console.log(results[kg].pagerank);
+    // }
     res.json(results);
     writeFile(results);
 });
@@ -42,8 +44,7 @@ app.get('/multiTagSearch', (req, res) => {
     var rankingMode = myURL.searchParams.get('rankBy');
     var tags = myURL.searchParams.get('tags').split(',');
     var results = querier.multiTagSearch(keyword, ...tags, rankingMode);
-    //per adesso inviamo la stessa key inserita, in seguito 
-    // i risultati della ricerca su lod cloud/datahub o un aggregato di entrambi
+  
     res.json(results);
     writeFile(results);
 });

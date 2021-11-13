@@ -154,7 +154,7 @@
 
                       // popoliamo il grafo con i nodi
                       for(kg in result){
-                        graph.addNode(result[kg].id);
+                        graph.addNode(result[kg].id, result[kg].pagerank);
                       }
                       //aggiungiamo i link tra i nodi del grafo
                       for(kg in result){
@@ -181,7 +181,8 @@
                         ];
 
                       graphics.node(function(node){
-                        var radius = 15;
+                        var radius = (node.data -0)/(3-0)*100+10
+                        //console.log(node.id + "--->" + radius);
                         var ui = Viva.Graph.svg("g");
                         var svgCircle = Viva.Graph.svg('circle')
                               .attr('cx', radius)
@@ -213,8 +214,8 @@
                         );
                         return ui;
                       })
-                      graphics.placeNode(function(nodeUI, pos){
-                        nodeUI.attr('transform', 'translate(' + (pos.x - 15) + ',' + (pos.y - 15) + ')');
+                      graphics.placeNode(function(nodeUI, pos, node){
+                        nodeUI.attr('transform', 'translate(' + (pos.x - ((node.data -0)/(3-0)*100+10)) + ',' + (pos.y - ((node.data -0)/(3-0)*100+10)) + ')');
                       })
 
                       var renderer = Viva.Graph.View.renderer(graph,
