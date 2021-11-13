@@ -34,8 +34,10 @@
                 path = 'multiTagSearch';
 
               if(target != ''){
+                // we ahave to clean the previous results first
                 $("#accordionPanels").html("");
                 $("#analyticsPanel").html("");
+                $("svg").hide();
 
                 $.ajax({
                     url: "/"+path+"?keyword="+target+"&rankBy="+rankingMode+"&tags="+tags,
@@ -165,6 +167,18 @@
                       }
 
                       var graphics = Viva.Graph.View.svgGraphics();
+                      var colors = [
+                        "#1f77b4", "#aec7e8",
+                        "#ff7f0e", "#ffbb78",
+                        "#2ca02c", "#98df8a",
+                        "#d62728", "#ff9896",
+                        "#9467bd", "#c5b0d5",
+                        "#8c564b", "#c49c94",
+                        "#e377c2", "#f7b6d2",
+                        "#7f7f7f", "#c7c7c7",
+                        "#bcbd22", "#dbdb8d",
+                        "#17becf", "#9edae5"
+                        ];
 
                       graphics.node(function(node){
                         var radius = 15;
@@ -172,14 +186,22 @@
                         var svgCircle = Viva.Graph.svg('circle')
                               .attr('cx', radius)
                               .attr('cy', radius)
-                              .attr('fill', 'red')
+                              .attr('fill', colors[Math.floor(Math.random() * 19)])
                               .attr('r', radius);           
                         var svgText = Viva.Graph.svg('text').attr('y', '15px').text("");                     
                         ui.append(svgCircle);
                         ui.append(svgText);
 
-                        // qui possiamo fare qualcosa quando passiamo con il  mouse su un nodo 
+                        // implementiamo il fulcro di questa seconda parte: pop up con le info di un nodo al double click
+                        $(ui).dblclick(
+                          function(){
+                            console.log('POP UPPP');
+                            $('#popuptext').replaceWith("<h1>" + node.id + "</h1>");
+                            $('#exampleModal').modal('show');
+                          }                          
+                        );
                         
+                        // qui possiamo fare qualcosa quando passiamo con il  mouse su un nodo                         
                         $(ui).hover(
                           function() {
                             console.log(node.id);         
@@ -192,7 +214,7 @@
                         return ui;
                       })
                       graphics.placeNode(function(nodeUI, pos){
-                        nodeUI.attr('transform', 'translate(' + (pos.x - 12) + ',' + (pos.y - 12) + ')');
+                        nodeUI.attr('transform', 'translate(' + (pos.x - 15) + ',' + (pos.y - 15) + ')');
                       })
 
                       var renderer = Viva.Graph.View.renderer(graph,
@@ -200,9 +222,11 @@
                               graphics : graphics
                           });
                       renderer.run();
+                                 
 
                       //var renderer = Viva.Graph.View.renderer(graph);
-                      //renderer.run();                    
+                      //renderer.run();           
+                      //use renderer.dispose() to delete the graph         
                     }
                 })
 
@@ -269,6 +293,25 @@
           </div>
         </div>
     </nav>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="popuptext">
+            ...
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="container my-5" style="max-width: 700px;">
         <h3>Enter a keyword...</h3>
