@@ -36,7 +36,7 @@
                     
                     if(target != ''){
                         // we have to clean the previous results first
-                        $("#accordionPanels").html("");
+                        $("#offcanvasScrolling").html("");
                         $("#analyticsPanel").html("");
                         $("svg").hide();
                         
@@ -83,7 +83,7 @@
                                 
                                 // popoliamo il grafo con i nodi
                                 for(kg in result){
-                                    graph.addNode(result[kg].id, result[kg].pagerank);
+                                    graph.addNode(result[kg].id, result[kg]);
                                 }
                                 //aggiungiamo i link tra i nodi del grafo
                                 for(kg in result){
@@ -122,7 +122,7 @@
                                 ];
                                 
                                 graphics.node(function(node){
-                                    var radius = (node.data -0)/(3-0)*100+10
+                                    var radius = (node.data.pagerank -0)/(3-0)*100+10
                                     //console.log(node.id + "--->" + radius);
                                     var ui = Viva.Graph.svg("g");
                                     var svgCircle = Viva.Graph.svg('circle')
@@ -137,44 +137,126 @@
                                     // implementiamo il fulcro di questa seconda parte: pop up con le info di un nodo al double click
                                     $(ui).dblclick(
                                         function(){
-                                            console.log('POP UPPP');
-                                            $('#popuptext').replaceWith("<h1>" + node.id + "</h1>");
+                                            $("#offcanvasScrolling").html("");
+
+                                            //description formatting
+                                            var currDescription = '<p>';
+                                            if(JSON.stringify(node.data.description).length > 600){
+                                                currDescription += node.data.description.slice(0, 600) + 
+                                                                    "<span id='dots" + node.id + "'>...</span><span style='display: none;' id='more" + node.id + "'>" + 
+                                                                    node.data.description.slice(600) + "</span><button type='button' class='btn btn-link' onclick='collapseDescription(\"" + node.id + "\")' id='myBtn" + node.id + "'>Read more</button></p>";                            
+                                            }else
+                                                currDescription += node.data.description + "</p>";
+
+                                            //keywords formatting section
+                                            var currentKeywords  = "<pre>"
+                                            for(key in node.data.keywords){
+                                                currentKeywords += "<span class='badge rounded-pill bg-secondary'>" + node.data.keywords[key] + "</span>"
+                                            }
+                                            currentKeywords += "</pre>";
+                                            
+                                            //links formatting section
+                                            var currentLinks;
+                                            if(node.data.links != ""){
+                                                currentLinks = "<pre><ul class='list-group'>";
+                                                for(link in node.data.links){
+                                                    currentLinks += "<li class='list-group-item d-flex justify-content-between align-items-center'>" +
+                                                                    node.data.links[link].target + "<span class='badge bg-primary rounded-pill'>" + node.data.links[link].value + "</span>"+
+                                                                    "</li>";
+                                                }
+                                                currentLinks += "</ul></pre>";
+                                            }else
+                                                currentLinks = "Not present";
+
+                                            //sparql formatting section
+                                            var sparqlEnd;
+                                            if(node.data.sparql != null){
+                                                sparqlEnd = "<div class='list-group'>" +
+                                                                "<a href='" + node.data.sparql.access_url + "' class='list-group-item'>" +
+                                                                    "<div class='d-flex w-100 justify-content-between'>" +
+                                                                    "<h5 class='mb-1'>SPARQL Endpoint</h5>" +
+                                                                    "<span class='badge bg-primary rounded-pill'>" + node.data.sparql.status + "</span>"+
+                                                                    "</div>" +
+                                                                    "<p class='mb-1'>" + node.data.sparql.description + "</p>" +
+                                                                    "<small>" + node.data.sparql.access_url  + "</small>" +
+                                                                "</a>" + 
+                                                                "</div>";
+                                            }else
+                                                sparqlEnd = "<div class='list-group'>" +
+                                                                "<a class='list-group-item'>" +
+                                                                    "<div class='d-flex w-100 justify-content-between'>" +
+                                                                    "<h5 class='mb-1'>SPARQL Endpoint</h5>" +
+                                                                    "</div>" +
+                                                                    "<p class='mb-1'>Not Present</p>" +
+                                                                "</a>" + 
+                                                                "</div>";
+
+                                            $("#offcanvasScrolling").append("<div class='offcanvas-header'>" +
+                                                                                "<h5 class='offcanvas-title' id='offcanvasWithBothOptionsLabel'>" + node.data.title + "</h5>" +
+                                                                                "<button type='button' class='btn-close text-reset' data-bs-dismiss='offcanvas' aria-label='Close'></button>" +
+                                                                            "</div>"+
+                                                                            "<div class='offcanvas-body'>" + 
+                                                                                "<strong>Id: </strong>" + node.id +
+                                                                                "<br><strong>Description: </strong>" + currDescription +
+                                                                                "<br><strong>Website: </strong><a href='" + node.data.website + "'>" + node.data.website + "</a>" + 
+                                                                                "<br><strong>Triples: </strong>" + node.data.triples +
+                                                                                "<br><strong>Keywords: </strong>" + currentKeywords +
+                                                                                "<strong>Links: </strong>" + currentLinks +
+                                                                                "<br><br>" + sparqlEnd +                                                                                
+                                                                            "</div>");
+
                                             $('#offcanvasScrolling').offcanvas('show');
                                         }                          
+                                    );
+                                    
+                                    // qui possiamo fare qualcosa quando passiamo con il  mouse su un nodo                         
+                                    $(ui).hover(
+                                        function() {
+                                            console.log(node.id);         
+                                            svgText.text(node.id);
+                                        },
+                                        function() {
+                                            svgText.text("");
+                                        }
                                         );
-                                        
-                                        // qui possiamo fare qualcosa quando passiamo con il  mouse su un nodo                         
-                                        $(ui).hover(
-                                            function() {
-                                                console.log(node.id);         
-                                                svgText.text(node.id);
-                                            },
-                                            function() {
-                                                svgText.text("");
-                                            }
-                                            );
-                                            return ui;
-                                        })
-                                        graphics.placeNode(function(nodeUI, pos, node){
-                                            nodeUI.attr('transform', 'translate(' + (pos.x - ((node.data -0)/(3-0)*100+10)) + ',' + (pos.y - ((node.data -0)/(3-0)*100+10)) + ')');
-                                        })
-                                        
-                                        var renderer = Viva.Graph.View.renderer(graph,
-                                        {
-                                            container: document.getElementById('graphArea'),
-                                            layout: layout,
-                                            graphics : graphics,
-                                            //interactive: false
-                                            interactive: 'node drag scroll' //  scroll
-                                        });
-                                        renderer.run();
-                                                                    
+                                        return ui;
+                                    })
+                                    graphics.placeNode(function(nodeUI, pos, node){
+                                        nodeUI.attr('transform', 'translate(' + (pos.x - ((node.data.pagerank -0)/(3-0)*100+10)) + ',' + (pos.y - ((node.data.pagerank -0)/(3-0)*100+10)) + ')');
+                                    })
+                                    
+                                    var renderer = Viva.Graph.View.renderer(graph,
+                                    {
+                                        container: document.getElementById('graphArea'),
+                                        layout: layout,
+                                        graphics : graphics,
+                                        //interactive: false
+                                        interactive: 'node drag scroll' //  scroll
+                                    });
+                                    renderer.run();                                                                    
                                                             
                             }
                         });
                     }
                 });
             });
+
+            //funzione per collassare le descriptions
+            function collapseDescription(i) {
+                var dots = $('#dots'+i)[0];                    
+                var moreText = $('#more'+i)[0];
+                var btnText = $('#myBtn'+i)[0];
+
+                if (dots.style.display === "none") {
+                    dots.style.display = "inline";
+                    btnText.innerHTML = "Read more"; 
+                    moreText.style.display = "none";
+                } else {
+                    dots.style.display = "none";
+                    btnText.innerHTML = "Read less"; 
+                    moreText.style.display = "inline";
+                }
+            }              
         </script>
 
         <style type="text/css" media="screen">
@@ -270,14 +352,9 @@
         </div>
 
         <!-- KG side info -->
-        <div class="offcanvas offcanvas-end" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
-            <div class="offcanvas-header">
-              <h5 class="offcanvas-title" id="offcanvasScrollingLabel">Colored with scrolling</h5>
-              <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-            </div>
-            <div class="offcanvas-body">
-              <p>Try scrolling the rest of the page to see this option in action.</p>
-            </div>
+        <div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasScrolling" aria-labelledby="offcanvasWithBothOptionsLabel">
+            
+           
         </div>
           
           
