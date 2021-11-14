@@ -11,11 +11,19 @@ var querier = new kgs_aggregator();
 //serviamo in GET la root
 app.get('/', (req, res) => {
     console.log('Homepage');
-    fs.readFile('index.html', (err, data) => {
+    fs.readFile('homepage.html', (err, data) => {
         res.write(data);
         res.end();
     });
     
+});
+
+app.get('/graphmode', (req, res) => {
+    console.log('GraphMode');
+    fs.readFile('graphmode.html', (err, data) => {
+        res.write(data);
+        res.end();
+    });
 });
 
 //serviamo la ricerca brutale della keyword inserita (può essere anche un'espressione regolare)
