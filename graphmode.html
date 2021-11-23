@@ -14,6 +14,8 @@
         <!-- VivaGraph -->
         <script type="text/javascript" src="vivagraph.js"></script>
 
+        <script type="text/javascript" src="saveSvgAsPng.js"></script>
+
         <title>KG Search Engine</title>
 
 
@@ -38,7 +40,8 @@
                         // we have to clean the previous results first
                         $("#offcanvasScrolling").html("");
                         $("#analyticsPanel").html("");
-                        $("svg").hide();
+                        //$("svg").hide();
+                        $("#graphArea").html("");
                         
                         $.ajax({
                             url: "/"+path+"?keyword="+target+"&rankBy="+rankingMode+"&tags="+tags,
@@ -74,8 +77,8 @@
                                                                     "</li>" +
                                                                 "</ol>" +
                                                             "</div>" +
-                                                            "<div class='card-footer text-muted text-center'><a href='results.json' class='btn btn-primary' download>Download</a></div>" +
-                                                            "</div>");
+                                                            "<div class='card-footer text-muted text-center'><a id='downloadButton' class='btn btn-primary' download>Download</a></div>" +
+                                                            "</div>");                                                            
                                 
                                 // (siamo ancora dentro l'ajax l'unico scope dove abbiamo i results con cui dobbiamo costruire il grafo)
                                 // let's try to show the graph
@@ -134,7 +137,7 @@
                                     ui.append(svgCircle);
                                     ui.append(svgText);
                                     
-                                    // implementiamo il fulcro di questa seconda parte: pop up con le info di un nodo al double click
+                                    // implementiamo il fulcro di questa seconda parte: pop up con le info di un nodo al click
                                     $(ui).click(
                                         function(){
                                             $("#offcanvasScrolling").html("");
@@ -233,8 +236,14 @@
                                         //interactive: false
                                         interactive: 'node drag scroll' //  scroll
                                     });
-                                    renderer.run();                                                                    
-                                                            
+                                    renderer.run();             
+                                    
+                                    // we have to provide the graph download
+                                    $("svg").attr("id", "graph");
+                                    $("#downloadButton").click(function(){
+                                        saveSvgAsPng(document.getElementById("graph"), "graph.png");
+                                        saveSvg(document.getElementById("graph"), "graph.svg");
+                                    });
                             }
                         });
                     }

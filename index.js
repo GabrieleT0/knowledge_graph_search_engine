@@ -64,7 +64,11 @@ app.get('/results.json', (req, res) => {
 
 app.get('/vivagraph.js', function (req, res, next) {
     res.sendFile(path.join(__dirname, '/vivagraph.js'))
-  })
+})
+
+app.get('/saveSvgAsPng.js', function (req, res, next) {
+    res.sendFile(path.join(__dirname, '/saveSvgAsPng.js'))
+})
 
 app.listen(PORT, function(){
     console.log('sono in ascolto sulla porta 8080');
