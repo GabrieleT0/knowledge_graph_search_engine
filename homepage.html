@@ -100,15 +100,18 @@
                                     var sparqlEnd;
                                     if(result[kg]["sparql"] != null){
                                         sparqlEnd = "<div class='list-group'>" +
-                                                        "<a href='" + result[kg]["sparql"]["access_url"] + "' class='list-group-item'>" +
+                                                        "<a  class='list-group-item'>" +
                                                             "<div class='d-flex w-100 justify-content-between'>" +
                                                             "<h5 class='mb-1'>SPARQL Endpoint</h5>" +
-                                                            "<span class='badge bg-primary rounded-pill'>" + result[kg]["sparql"]["status"] + "</span>"+
+                                                            "<div id='dinamicPart-" + i + "'>" +                                                   
+                                                                "<button style='border:none;background-color:white' onclick='checkAvailability("+i+")'><span class='badge rounded-pill bg-primary'>Check Availability</span></button>"+
+                                                            "</div>" +                                                            
                                                             "</div>" +
                                                             "<p class='mb-1'>" +  result[kg]["sparql"]["description"] + "</p>" +
-                                                            "<small>" + result[kg]["sparql"]["access_url"] + "</small>" +
+                                                            "<small id='endpoint-"+i+"'>" + result[kg]["sparql"]["access_url"] + "</small>" +
                                                         "</a>" + 
                                                         "</div>";
+                                        
                                     }else
                                         sparqlEnd = "<div class='list-group'>" +
                                                         "<a class='list-group-item'>" +
@@ -138,13 +141,33 @@
                                                                         "</div>" +
                                                                     "</div>" +
                                                                 "</div>");
-                                    i++;                                        
+                                    i++;                                    
                                 }
                             }
                         });  
                     }                
                });
            });
+
+           function checkAvailability(i){
+               endpoint = $("#endpoint-"+i).text();
+               $.ajax({
+                   url: "/checkAvailability?target="+endpoint,
+                   beforeSend: function(){
+                       $("#dinamicPart-"+i).html("");
+                       $("#dinamicPart-"+i).html("<div class='spinner-border' role='status'></div>");                       
+                   },
+                   success: function(result){
+                       console.log(result);
+                       if(result){
+                           $("#dinamicPart-"+i).html("<span class='badge rounded-pill bg-success'>Available</span>");
+                       }else{
+                           $("#dinamicPart-"+i).html("<span class='badge rounded-pill bg-danger'>Not Available</span>");
+                       }
+                   }
+               });
+
+           }
 
            //funzione per collassare le descriptions
             function collapseDescription(i) {
