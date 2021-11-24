@@ -100,7 +100,7 @@
                                     var sparqlEnd;
                                     if(result[kg]["sparql"] != null){
                                         sparqlEnd = "<div class='list-group'>" +
-                                                        "<a  class='list-group-item'>" +
+                                                        "<div  class='list-group-item'>" +
                                                             "<div class='d-flex w-100 justify-content-between'>" +
                                                             "<h5 class='mb-1'>SPARQL Endpoint</h5>" +
                                                             "<div id='dinamicPart-" + i + "'>" +                                                   
@@ -108,8 +108,8 @@
                                                             "</div>" +                                                            
                                                             "</div>" +
                                                             "<p class='mb-1'>" +  result[kg]["sparql"]["description"] + "</p>" +
-                                                            "<small id='endpoint-"+i+"'>" + result[kg]["sparql"]["access_url"] + "</small>" +
-                                                        "</a>" + 
+                                                            "<a href='"+result[kg].sparql.access_url+"'><small id='endpoint-"+i+"'>" + result[kg]["sparql"]["access_url"] + "</small></a>" +
+                                                        "</div>" + 
                                                         "</div>";
                                         
                                     }else
@@ -207,10 +207,8 @@
               </button>
               <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
-                  <a class="nav-link active" aria-current="page" href="http://localhost:8080">Home</a>
-                  <a class="nav-link" href="http://localhost:8080/graphmode">Graph Visualization Mode</a>
-                  <a class="nav-link" href="#">About</a>
-                  
+                  <a class="nav-link active" aria-current="page" href="https://kgs-search-engine.herokuapp.com">Home</a>
+                  <a class="nav-link" href="https://kgs-search-engine.herokuapp.com/graphmode">Graph Visualization Mode</a>                  
                 </div>
               </div>
             </div>

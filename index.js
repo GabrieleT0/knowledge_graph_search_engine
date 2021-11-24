@@ -83,12 +83,12 @@ app.get('/results.json', (req, res) => {
     res.download('results.json');
 })
 
-app.get('/vivagraph.js', function (req, res, next) {
-    res.sendFile(path.join(__dirname, '/vivagraph.js'))
+app.get('/plugins/vivagraph.js', function (req, res, next) {
+    res.sendFile(path.join(__dirname, '/plugins/vivagraph.js'))
 })
 
-app.get('/saveSvgAsPng.js', function (req, res, next) {
-    res.sendFile(path.join(__dirname, '/saveSvgAsPng.js'))
+app.get('/plugins/saveSvgAsPng.js', function (req, res, next) {
+    res.sendFile(path.join(__dirname, '/plugins/saveSvgAsPng.js'))
 })
 
 app.listen(PORT, function(){

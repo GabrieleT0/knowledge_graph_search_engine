@@ -12,9 +12,9 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
         <!-- VivaGraph -->
-        <script type="text/javascript" src="vivagraph.js"></script>
+        <script type="text/javascript" src="plugins/vivagraph.js"></script>
 
-        <script type="text/javascript" src="saveSvgAsPng.js"></script>
+        <script type="text/javascript" src="plugins/saveSvgAsPng.js"></script>
 
         <title>KG Search Engine</title>
 
@@ -175,7 +175,7 @@
                                             var sparqlEnd;
                                             if(node.data.sparql != null){
                                                 sparqlEnd = "<div class='list-group'>" +
-                                                                "<a  class='list-group-item'>" +
+                                                                "<div class='list-group-item'>" +
                                                                     "<div class='d-flex w-100 justify-content-between'>" +
                                                                     "<h5 class='mb-1'>SPARQL Endpoint</h5>" +
                                                                     "<div id='dinamicPart'>" +                                                   
@@ -183,8 +183,8 @@
                                                                     "</div>" +
                                                                     "</div>" +
                                                                     "<p class='mb-1'>" + node.data.sparql.description + "</p>" +
-                                                                    "<small>" + node.data.sparql.access_url  + "</small>" +
-                                                                "</a>" + 
+                                                                    "<a href='"+node.data.sparql.access_url+"'><small>" + node.data.sparql.access_url  + "</small></a>" +
+                                                                "</div>"
                                                                 "</div>";
                                             }else
                                                 sparqlEnd = "<div class='list-group'>" +
@@ -323,9 +323,8 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
-                <a class="nav-link" aria-current="page" href="http://localhost:8080">Home</a>
-                <a class="nav-link active" href="http://localhost:8080/graphmode">Graph Visualization Mode</a>
-                <a class="nav-link" href="#">About</a>                
+                <a class="nav-link" aria-current="page" href="https://kgs-search-engine.herokuapp.com">Home</a>
+                <a class="nav-link active" href="https://kgs-search-engine.herokuapp.com/graphmode">Graph Visualization Mode</a>              
                 </div>
             </div>
             </div>
