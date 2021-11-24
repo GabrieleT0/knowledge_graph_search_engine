@@ -1,4 +1,5 @@
 const express = require('express');
+const http_tool = require ('xmlhttprequest').XMLHttpRequest;
 var fs = require('fs');
 var kgs_aggregator = require('kgs_results_aggregator');
 const path = require('path');
@@ -55,6 +56,26 @@ app.get('/multiTagSearch', (req, res) => {
   
     res.json(results);
     writeFile(results);
+});
+
+app.get('/checkAvailability', (req, res) => {
+    console.log('check availability request');
+    //url formatting
+    const myURL = new URL(req.url, 'https://127.0.0.1:'+PORT);
+    console.log(myURL);
+    var targetSparql = myURL.searchParams.get('target');
+    var request = new http_tool();
+    request.open('GET', targetSparql, false);
+    request.send();
+    if(request.status == 200){
+        console.log("devo inviare l'ok per l'availability");
+        console.log(request.status);
+        res.send(true);
+    }else{
+        console.log('questo end non funziona manco per il cazzo');
+        console.log(request.status);
+        res.send(false);
+    }
 });
 
 app.get('/results.json', (req, res) => {

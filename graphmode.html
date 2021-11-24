@@ -175,10 +175,12 @@
                                             var sparqlEnd;
                                             if(node.data.sparql != null){
                                                 sparqlEnd = "<div class='list-group'>" +
-                                                                "<a href='" + node.data.sparql.access_url + "' class='list-group-item'>" +
+                                                                "<a  class='list-group-item'>" +
                                                                     "<div class='d-flex w-100 justify-content-between'>" +
                                                                     "<h5 class='mb-1'>SPARQL Endpoint</h5>" +
-                                                                    "<span class='badge bg-primary rounded-pill'>" + node.data.sparql.status + "</span>"+
+                                                                    "<div id='dinamicPart'>" +                                                   
+                                                                        "<span id='currentEndpoint' class='badge rounded-pill bg-primary'>Check Availability</span>"+
+                                                                    "</div>" +
                                                                     "</div>" +
                                                                     "<p class='mb-1'>" + node.data.sparql.description + "</p>" +
                                                                     "<small>" + node.data.sparql.access_url  + "</small>" +
@@ -194,9 +196,10 @@
                                                                 "</a>" + 
                                                                 "</div>";
 
+                                                                
                                             $("#offcanvasScrolling").append("<div class='offcanvas-header'>" +
-                                                                                "<h5 class='offcanvas-title' id='offcanvasWithBothOptionsLabel'>" + node.data.title + "</h5>" +
-                                                                                "<button type='button' class='btn-close text-reset' data-bs-dismiss='offcanvas' aria-label='Close'></button>" +
+                                                                            "<h5 class='offcanvas-title' id='offcanvasWithBothOptionsLabel'>" + node.data.title + "</h5>" +
+                                                                            "<button type='button' class='btn-close text-reset' data-bs-dismiss='offcanvas' aria-label='Close'></button>" +
                                                                             "</div>"+
                                                                             "<div class='offcanvas-body'>" + 
                                                                                 "<strong>Id: </strong>" + node.id +
@@ -206,9 +209,27 @@
                                                                                 "<br><strong>Keywords: </strong>" + currentKeywords +
                                                                                 "<strong>Links: </strong>" + currentLinks +
                                                                                 "<br><br>" + sparqlEnd +                                                                                
-                                                                            "</div>");
-
+                                                                                "</div>");
+                                                    
                                             $('#offcanvasScrolling').offcanvas('show');
+                                            $("#currentEndpoint").click(function(){
+                                                $.ajax({
+                                                    url: "/checkAvailability"+"?target="+node.data.sparql.access_url,
+                                                    beforeSend: function(){
+                                                        $("#dinamicPart").html("");
+                                                        $("#dinamicPart").html("<div class='spinner-border' role='status'></div>")
+                                                    },
+                                                    success: function(result){
+                                                        console.log(result);
+                                                        if(result){
+                                                            $("#dinamicPart").html("<span id='currentEndpoint' class='badge rounded-pill bg-success'>Available</span>");
+                                                        }else{
+                                                            $("#dinamicPart").html("<span id='currentEndpoint' class='badge rounded-pill bg-danger'>Not Available</span>");                                                            
+                                                        }
+                                                    }
+                                                });
+                                            });
+
                                         }                          
                                     );
                                     
