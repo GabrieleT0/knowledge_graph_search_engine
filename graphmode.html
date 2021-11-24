@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+
+        <!-- jQuery -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+        <!-- VivaGraph -->
+        <script type="text/javascript" src="plugins/vivagraph.js"></script>
+
+        <script type="text/javascript" src="plugins/saveSvgAsPng.js"></script>
+
+        <title>KG Search Engine</title>
+
+
+        <script>
+            $(document).ready(function(){
+                $("#searchButton").click(function(){
+                    var path;
+                    var target = $('#searchValue').val();
+                    var rankingMode = "authority"
+                    
+                    var tags = new Array();
+                    $.each($("input[name='tagSelection']:checked"), function(){
+                        tags.push($(this).val());
+                    });
+                    
+                    if(tags == '')
+                    path = 'brutalSearch';
+                    else
+                    path = 'multiTagSearch';
+                    
+                    if(target != ''){
+                        // we have to clean the previous results first
+                        $("#offcanvasScrolling").html("");
+                        $("#analyticsPanel").html("");
+                        //$("svg").hide();
+                        $("#graphArea").html("");
+                        
+                        $.ajax({
+                            url: "/"+path+"?keyword="+target+"&rankBy="+rankingMode+"&tags="+tags,
+                            success: function(result){
+                                // analyticsPanel formatting
+                                $("#analyticsPanel").html("<div class='card'>" +
+                                                            "<h5 class='card-header'>Summary</h5>" +
+                                                            "<div class='card-body'>" + 
+                                                                "<ol class='list-group'>" +
+                                                                    "<li class='list-group-item d-flex justify-content-between align-items-start'>" +
+                                                                        "<div class='ms-2 me-auto'>" +
+                                                                            "<div class='fw-bold'>Keyword</div>" +
+                                                                        "</div>" +
+                                                                        "<span class='badge bg-primary rounded-pill'>" + target + "</span>" +
+                                                                    "</li>" +
+                                                                    "<li class='list-group-item d-flex justify-content-between align-items-start'>" +
+                                                                        "<div class='ms-2 me-auto'>" +
+                                                                            "<div class='fw-bold'>Ranking</div>" + 
+                                                                        "</div>" + 
+                                                                        "<span class='badge bg-primary rounded-pill'>" + rankingMode + "</span>" +
+                                                                    "</li>" +
+                                                                    "<li class='list-group-item d-flex justify-content-between align-items-start'>" +
+                                                                        "<div class='ms-2 me-auto'>" +
+                                                                            "<div class='fw-bold'>Search Mode</div>" + 
+                                                                        "</div>" + 
+                                                                        "<span class='badge bg-primary rounded-pill'>" + path + "</span>" +
+                                                                    "</li>" +                                                                    
+                                                                    "<li class='list-group-item d-flex justify-content-between align-items-start'>" +
+                                                                        "<div class='ms-2 me-auto'>" +
+                                                                            "<div class='fw-bold'>Num of Results</div>" +
+                                                                        "</div>" +
+                                                                        "<span class='badge bg-primary rounded-pill'>" + Object.keys(result).length + "</span>" +
+                                                                    "</li>" +
+                                                                "</ol>" +
+                                                            "</div>" +
+                                                            "<div class='card-footer text-muted text-center'><a id='downloadButton' class='btn btn-primary' download>Download</a></div>" +
+                                                            "</div>");                                                            
+                                
+                                // (siamo ancora dentro l'ajax l'unico scope dove abbiamo i results con cui dobbiamo costruire il grafo)
+                                // let's try to show the graph
+                                var graph = Viva.Graph.graph();
+                                
+                                // popoliamo il grafo con i nodi
+                                for(kg in result){
+                                    graph.addNode(result[kg].id, result[kg]);
+                                }
+                                //aggiungiamo i link tra i nodi del grafo
+                                for(kg in result){
+                                    var currKGLinks = result[kg].links;
+                                    for(link in currKGLinks){
+                                        if(graph.getNode(currKGLinks[link].target) != null){
+                                            graph.addLink(result[kg].id, currKGLinks[link].target, currKGLinks[link].value);
+                                        }
+                                    }
+                                }
+                                
+                                // here we deal with the phisics of the graph
+                                var layout = Viva.Graph.Layout.forceDirected(graph, {
+                                    springLength : 80,  // Ideal length for links (springs in physical model).
+                                    springCoeff : 0.0002, // Hook's law coefficient. 1 - solid spring
+                                    gravity : -0.7, // Coulomb's law coefficient. It's used to repel nodes thus should be negative, if you make it positive nodes start attract each other :).
+                                    dragCoeff : 0.018, // Used to slow down system, thus should be less than 1. The closer it is to 0 the less tight system will be.
+                                    theta: 0.8, // The closer it's to 1 the more nodes algorithm will have to go through. Setting it to one makes Barnes Hut simulation no different from 34         * brute-force forces calculation (each node is considered).
+                                    timeStep : 15, // Default time step (dt) for forces integration
+                                    stableThreshold: 0.001 // Maximum movement of the system which can be considered as stabilized   
+                                    
+                                });
+                                
+                                var graphics = Viva.Graph.View.svgGraphics();
+                                var colors = [
+                                    "#1f77b4", "#aec7e8",
+                                    "#ff7f0e", "#ffbb78",
+                                    "#2ca02c", "#98df8a",
+                                    "#d62728", "#ff9896",
+                                    "#9467bd", "#c5b0d5",
+                                    "#8c564b", "#c49c94",
+                                    "#e377c2", "#f7b6d2",
+                                    "#7f7f7f", "#c7c7c7",
+                                    "#bcbd22", "#dbdb8d",
+                                    "#17becf", "#9edae5"
+                                ];
+                                
+                                graphics.node(function(node){
+                                    var radius = (node.data.pagerank -0)/(3-0)*100+10
+                                    //console.log(node.id + "--->" + radius);
+                                    var ui = Viva.Graph.svg("g");
+                                    var svgCircle = Viva.Graph.svg('circle')
+                                    .attr('cx', radius)
+                                    .attr('cy', radius)
+                                    .attr('fill', colors[Math.floor(Math.random() * 19)])
+                                    .attr('r', radius);           
+                                    var svgText = Viva.Graph.svg('text').attr('y', '15px').text("");                     
+                                    ui.append(svgCircle);
+                                    ui.append(svgText);
+                                    
+                                    // implementiamo il fulcro di questa seconda parte: pop up con le info di un nodo al click
+                                    $(ui).click(
+                                        function(){
+                                            $("#offcanvasScrolling").html("");
+
+                                            //description formatting
+                                            var currDescription = '<p>';
+                                            if(JSON.stringify(node.data.description).length > 600){
+                                                currDescription += node.data.description.slice(0, 600) + 
+                                                                    "<span id='dots" + node.id + "'>...</span><span style='display: none;' id='more" + node.id + "'>" + 
+                                                                    node.data.description.slice(600) + "</span><button type='button' class='btn btn-link' onclick='collapseDescription(\"" + node.id + "\")' id='myBtn" + node.id + "'>Read more</button></p>";                            
+                                            }else
+                                                currDescription += node.data.description + "</p>";
+
+                                            //keywords formatting section
+                                            var currentKeywords  = "<pre>"
+                                            for(key in node.data.keywords){
+                                                currentKeywords += "<span class='badge rounded-pill bg-secondary'>" + node.data.keywords[key] + "</span>"
+                                            }
+                                            currentKeywords += "</pre>";
+                                            
+                                            //links formatting section
+                                            var currentLinks;
+                                            if(node.data.links != ""){
+                                                currentLinks = "<pre><ul class='list-group'>";
+                                                for(link in node.data.links){
+                                                    currentLinks += "<li class='list-group-item d-flex justify-content-between align-items-center'>" +
+                                                                    node.data.links[link].target + "<span class='badge bg-primary rounded-pill'>" + node.data.links[link].value + "</span>"+
+                                                                    "</li>";
+                                                }
+                                                currentLinks += "</ul></pre>";
+                                            }else
+                                                currentLinks = "Not present";
+
+                                            //sparql formatting section
+                                            var sparqlEnd;
+                                            if(node.data.sparql != null){
+                                                sparqlEnd = "<div class='list-group'>" +
+                                                                "<div class='list-group-item'>" +
+                                                                    "<div class='d-flex w-100 justify-content-between'>" +
+                                                                    "<h5 class='mb-1'>SPARQL Endpoint</h5>" +
+                                                                    "<div id='dinamicPart'>" +                                                   
+                                                                        "<span id='currentEndpoint' class='badge rounded-pill bg-primary'>Check Availability</span>"+
+                                                                    "</div>" +
+                                                                    "</div>" +
+                                                                    "<p class='mb-1'>" + node.data.sparql.description + "</p>" +
+                                                                    "<a href='"+node.data.sparql.access_url+"'><small>" + node.data.sparql.access_url  + "</small></a>" +
+                                                                "</div>"
+                                                                "</div>";
+                                            }else
+                                                sparqlEnd = "<div class='list-group'>" +
+                                                                "<a class='list-group-item'>" +
+                                                                    "<div class='d-flex w-100 justify-content-between'>" +
+                                                                    "<h5 class='mb-1'>SPARQL Endpoint</h5>" +
+                                                                    "</div>" +
+                                                                    "<p class='mb-1'>Not Present</p>" +
+                                                                "</a>" + 
+                                                                "</div>";
+
+                                                                
+                                            $("#offcanvasScrolling").append("<div class='offcanvas-header'>" +
+                                                                            "<h5 class='offcanvas-title' id='offcanvasWithBothOptionsLabel'>" + node.data.title + "</h5>" +
+                                                                            "<button type='button' class='btn-close text-reset' data-bs-dismiss='offcanvas' aria-label='Close'></button>" +
+                                                                            "</div>"+
+                                                                            "<div class='offcanvas-body'>" + 
+                                                                                "<strong>Id: </strong>" + node.id +
+                                                                                "<br><strong>Description: </strong>" + currDescription +
+                                                                                "<br><strong>Website: </strong><a href='" + node.data.website + "'>" + node.data.website + "</a>" + 
+                                                                                "<br><strong>Triples: </strong>" + node.data.triples +
+                                                                                "<br><strong>Keywords: </strong>" + currentKeywords +
+                                                                                "<strong>Links: </strong>" + currentLinks +
+                                                                                "<br><br>" + sparqlEnd +                                                                                
+                                                                                "</div>");
+                                                    
+                                            $('#offcanvasScrolling').offcanvas('show');
+                                            $("#currentEndpoint").click(function(){
+                                                $.ajax({
+                                                    url: "/checkAvailability"+"?target="+node.data.sparql.access_url,
+                                                    beforeSend: function(){
+                                                        $("#dinamicPart").html("");
+                                                        $("#dinamicPart").html("<div class='spinner-border' role='status'></div>")
+                                                    },
+                                                    success: function(result){
+                                                        console.log(result);
+                                                        if(result){
+                                                            $("#dinamicPart").html("<span id='currentEndpoint' class='badge rounded-pill bg-success'>Available</span>");
+                                                        }else{
+                                                            $("#dinamicPart").html("<span id='currentEndpoint' class='badge rounded-pill bg-danger'>Not Available</span>");                                                            
+                                                        }
+                                                    }
+                                                });
+                                            });
+
+                                        }                          
+                                    );
+                                    
+                                    // qui possiamo fare qualcosa quando passiamo con il  mouse su un nodo                         
+                                    $(ui).hover(
+                                        function() {
+                                            console.log(node.id);         
+                                            svgText.text(node.id);
+                                        },
+                                        function() {
+                                            svgText.text("");
+                                        }
+                                        );
+                                        return ui;
+                                    })
+                                    graphics.placeNode(function(nodeUI, pos, node){
+                                        nodeUI.attr('transform', 'translate(' + (pos.x - ((node.data.pagerank -0)/(3-0)*100+10)) + ',' + (pos.y - ((node.data.pagerank -0)/(3-0)*100+10)) + ')');
+                                    })
+                                    
+                                    var renderer = Viva.Graph.View.renderer(graph,
+                                    {
+                                        container: document.getElementById('graphArea'),
+                                        layout: layout,
+                                        graphics : graphics,
+                                        //interactive: false
+                                        interactive: 'node drag scroll' //  scroll
+                                    });
+                                    renderer.run();             
+                                    
+                                    // we have to provide the graph download
+                                    $("svg").attr("id", "graph");
+                                    $("#downloadButton").click(function(){
+                                        saveSvgAsPng(document.getElementById("graph"), "graph.png");
+                                        saveSvg(document.getElementById("graph"), "graph.svg");
+                                    });
+                            }
+                        });
+                    }
+                });
+            });
+
+            //funzione per collassare le descriptions
+            function collapseDescription(i) {
+                var dots = $('#dots'+i)[0];                    
+                var moreText = $('#more'+i)[0];
+                var btnText = $('#myBtn'+i)[0];
+
+                if (dots.style.display === "none") {
+                    dots.style.display = "inline";
+                    btnText.innerHTML = "Read more"; 
+                    moreText.style.display = "none";
+                } else {
+                    dots.style.display = "none";
+                    btnText.innerHTML = "Read less"; 
+                    moreText.style.display = "inline";
+                }
+            }              
+        </script>
+
+        <style type="text/css" media="screen">
+            html, body, svg { width: 100%; height: 100%;}
+       
+            * {box-sizing: border-box}
+            
+            /* Style the tab */
+            .tab {
+                float: left;
+                width: 23%;
+                height: 100%;
+            }
+            /* Style the tab content */
+            .tabcontent {
+            float: left;
+            padding: 0px 12px;
+            width: 77%;
+            border-left: none;
+            height: 100%;
+            }
+        </style>
+
+    </head>
+    <body>
+        <!-- Option 1: Bootstrap Bundle with Popper -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+            <a class="navbar-brand" href="#">KG Search Engine</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                <a class="nav-link" aria-current="page" href="https://kgs-search-engine.herokuapp.com">Home</a>
+                <a class="nav-link active" href="https://kgs-search-engine.herokuapp.com/graphmode">Graph Visualization Mode</a>              
+                </div>
+            </div>
+            </div>
+        </nav>
+        
+        <div class="tab bg-dark">
+            <div class="container my-5">
+                
+                <!-- keyword input area -->
+                <h3 style="color: white;">Enter a keyword...</h3>
+                <div class="input-group mb-3">
+                    <form></form>
+                    <input id="searchValue" type="text" class="form-control" placeholder="Knowledge Graph keyword"  aria-describedby="button-addon2">
+                    <button class="btn btn-outline-secondary" type="button" id="searchButton">Search</button>
+                </div>
+
+                <!-- tag selection area -->
+                <small class="text-muted">Focus the search only on the selected tags..</small>
+                <form id="tagForm">
+                <input type="checkbox" class="btn-check" name="tagSelection" id="checkId" autocomplete="off" value="id">
+                <label class="btn btn-outline-primary" for="checkId">id</label>
+
+                <input type="checkbox" class="btn-check" name="tagSelection" id="checkTitle" autocomplete="off" value="title">
+                <label class="btn btn-outline-primary" for="checkTitle">title</label>
+
+                <input type="checkbox" class="btn-check" name="tagSelection" id="checkDescription" autocomplete="off" value="description">
+                <label class="btn btn-outline-primary" for="checkDescription">description</label>
+
+                <input type="checkbox" class="btn-check" name="tagSelection" id="checkWebsite" autocomplete="off" value="website">
+                <label class="btn btn-outline-primary" for="checkWebsite">website</label>
+
+                <input type="checkbox" class="btn-check" name="tagSelection" id="checkTriples" autocomplete="off" value="triples">
+                <label class="btn btn-outline-primary" for="checkTriples">triples</label>
+
+                <input type="checkbox" class="btn-check" name="tagSelection" id="checkKeywords" autocomplete="off" value="keywords">
+                <label class="btn btn-outline-primary" for="checkKeywords">keywords</label>
+
+                <input type="checkbox" class="btn-check" name="tagSelection" id="checkLinks" autocomplete="off" value="links">
+                <label class="btn btn-outline-primary" for="checkLinks">links</label>
+
+                <input type="checkbox" class="btn-check" name="tagSelection" id="checkSparql" autocomplete="off" value="sparql">
+                <label class="btn btn-outline-primary" for="checkSparql">sparql</label>
+
+                </form>
+
+                <div class="container-fluid my-3" id="analyticsPanel">    
+  
+                </div>
+            </div>           
+        </div>
+        
+        <div  class="container-fluid tabcontent" id="graphArea">
+
+        </div>
+
+        <!-- KG side info -->
+        <div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasScrolling" aria-labelledby="offcanvasWithBothOptionsLabel">
+            
+           
+        </div>
+          
+          
+
+        
+    </body>
+</html>
