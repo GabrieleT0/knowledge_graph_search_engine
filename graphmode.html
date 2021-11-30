@@ -123,7 +123,27 @@
                                     "#bcbd22", "#dbdb8d",
                                     "#17becf", "#9edae5"
                                 ];
-                                
+
+                                var highlightRelatedNodes = function(nodeId, isOn) {
+                                    // just enumerate all realted nodes and update link color:
+                                    graph.forEachLinkedNode(nodeId, function(node, link) {
+                                        var nodeUI = graphics.getNodeUI(node.id);
+                                        var linkUI = graphics.getLinkUI(link.id);
+                                        var svgText = nodeUI.childNodes[1];
+                                        
+                                        if (nodeUI) {  
+                                            if(isOn)                                          
+                                                svgText.text(node.id);
+                                            else    
+                                                svgText.text("");                                           
+                                        }
+                                        if (linkUI) {
+                                            // linkUI is a UI object created by graphics below
+                                            linkUI.attr("stroke", isOn ? "red" : "#999");
+                                        }
+                                    });
+                                };                            
+
                                 graphics.node(function(node){
                                     var radius = (node.data.pagerank -0)/(3-0)*100+10
                                     //console.log(node.id + "--->" + radius);
@@ -236,35 +256,57 @@
                                     // qui possiamo fare qualcosa quando passiamo con il  mouse su un nodo                         
                                     $(ui).hover(
                                         function() {
+                                            highlightRelatedNodes(node.id, true);
                                             console.log(node.id);         
                                             svgText.text(node.id);
                                         },
                                         function() {
+                                            highlightRelatedNodes(node.id, false);
                                             svgText.text("");
                                         }
                                         );
                                         return ui;
-                                    })
-                                    graphics.placeNode(function(nodeUI, pos, node){
-                                        nodeUI.attr('transform', 'translate(' + (pos.x - ((node.data.pagerank -0)/(3-0)*100+10)) + ',' + (pos.y - ((node.data.pagerank -0)/(3-0)*100+10)) + ')');
-                                    })
+                                })
+
+                                graphics.placeNode(function(nodeUI, pos, node){
+                                    nodeUI.attr('transform', 'translate(' + (pos.x - ((node.data.pagerank -0)/(3-0)*100+10)) + ',' + (pos.y - ((node.data.pagerank -0)/(3-0)*100+10)) + ')');
+                                })                               
+
+                                graphics.link(function(link){
+                                    var prob = (link.data - 0) / (100000000 - 0);
+                                    var width = ((25 - 1)*prob)+1;                                    
+                                    if (link.data >= 150 && link.data < 500)
+                                        width+=3;
+                                    if (link.data >= 500 && link.data < 500000)
+                                        width+=2;
+                                    if (link.data >= 500000 && link.data < 50000000)
+                                        width+=0.5;
+
+                                    var linkLine = Viva.Graph.svg('line').attr('stroke', '#999')
+                                                                         .attr('stroke-width', width)
+                                                                         .text(link.data);
+                                    var svgText = Viva.Graph.svg('text').text(link.data);   
+                                    linkLine.append(svgText);
                                     
-                                    var renderer = Viva.Graph.View.renderer(graph,
-                                    {
-                                        container: document.getElementById('graphArea'),
-                                        layout: layout,
-                                        graphics : graphics,
-                                        //interactive: false
-                                        interactive: 'node drag scroll' //  scroll
-                                    });
-                                    renderer.run();             
-                                    
-                                    // we have to provide the graph download
-                                    $("svg").attr("id", "graph");
-                                    $("#downloadButton").click(function(){
-                                        saveSvgAsPng(document.getElementById("graph"), "graph.png");
-                                        saveSvg(document.getElementById("graph"), "graph.svg");
-                                    });
+                                    return linkLine
+                                })
+                                
+                                var renderer = Viva.Graph.View.renderer(graph,
+                                {
+                                    container: document.getElementById('graphArea'),
+                                    layout: layout,
+                                    graphics : graphics,
+                                    //interactive: false
+                                    interactive: 'node drag scroll' //  scroll
+                                });
+                                renderer.run();
+
+                                // we have to provide the graph download
+                                $("svg").attr("id", "graph");
+                                $("#downloadButton").click(function(){                                    
+                                    saveSvgAsPng(document.getElementById("graph"), "graph.png");
+                                    saveSvg(document.getElementById("graph"), "graph.svg");
+                                });
                             }
                         });
                     }
@@ -376,16 +418,17 @@
             </div>           
         </div>
         
+        
         <div  class="container-fluid tabcontent" id="graphArea">
-
+            
         </div>
-
+        
+        
         <!-- KG side info -->
         <div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasScrolling" aria-labelledby="offcanvasWithBothOptionsLabel">
             
-           
+            
         </div>
-          
           
 
         
