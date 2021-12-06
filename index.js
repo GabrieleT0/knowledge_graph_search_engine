@@ -35,13 +35,35 @@ app.get('/brutalSearch', (req, res) => {
     console.log(myURL);
     var keyword = myURL.searchParams.get('keyword');
     var rankingMode = myURL.searchParams.get('rankBy');
-    var results = querier.brutalSearch(keyword, rankingMode);
-    // for(var kg in results){
-    //     if(results[kg].id == 'revyu')
-    //         console.log(results[kg].pagerank);
-    // }
-    res.json(results);
-    writeFile(results);
+
+    //query
+    var body;
+    if(myURL.searchParams.has('returnOnly')){
+        var outTags = myURL.searchParams.get('returnOnly').split(',');
+        body = querier.filterRersults(querier.brutalSearch(keyword, rankingMode), ...outTags);
+        
+    }else{
+        body = querier.brutalSearch(keyword, rankingMode);
+    }    
+
+
+    //response formatting
+    res.set('Content-Type', 'application/json');
+    var resultsJson = JSON.parse('{}');
+    resultsJson['credits'] = "Antonio Giulio, Maria Angela Pellegrino"
+    resultsJson['keyword'] = keyword;
+    resultsJson['tags'] = null;
+    if(rankingMode === null){
+        resultsJson['ranking'] = 'name';
+    }else{
+        resultsJson['ranking'] = rankingMode;
+    }
+    resultsJson['numOfResults'] = Object.keys(body).length;
+    resultsJson['results'] = body;
+
+    res.write(JSON.stringify(resultsJson, null, 2));
+    writeFile(resultsJson);
+    res.end();
 });
 
 app.get('/multiTagSearch', (req, res) => {
@@ -52,10 +74,33 @@ app.get('/multiTagSearch', (req, res) => {
     var keyword = myURL.searchParams.get('keyword');
     var rankingMode = myURL.searchParams.get('rankBy');
     var tags = myURL.searchParams.get('tags').split(',');
-    var results = querier.multiTagSearch(keyword, ...tags, rankingMode);
+
+    //query
+    if(myURL.searchParams.has('returnOnly')){
+        var outTags = myURL.searchParams.get('returnOnly').split(',');
+        body = querier.filterRersults(querier.multiTagSearch(keyword, ...tags, rankingMode), ...outTags);
+        
+    }else{
+        body = querier.multiTagSearch(keyword, ...tags, rankingMode);
+    }
+
+    //response formatting
+    res.set('Content-Type', 'application/json');
+    var resultsJson = JSON.parse('{}');
+    resultsJson['credits'] = "Antonio Giulio, Maria Angela Pellegrino"
+    resultsJson['keyword'] = keyword;
+    resultsJson['tags'] = tags;
+    if(rankingMode === null){
+        resultsJson['ranking'] = 'name';
+    }else{
+        resultsJson['ranking'] = rankingMode;
+    }
+    resultsJson['numOfResults'] = Object.keys(body).length;
+    resultsJson['results'] = body;
   
-    res.json(results);
-    writeFile(results);
+    res.write(JSON.stringify(resultsJson, null, 2));
+    writeFile(resultsJson);
+    res.end();
 });
 
 app.get('/checkAvailability', (req, res) => {

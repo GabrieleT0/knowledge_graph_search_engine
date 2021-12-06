@@ -46,6 +46,7 @@
                         $.ajax({
                             url: "/"+path+"?keyword="+target+"&rankBy="+rankingMode+"&tags="+tags,
                             success: function(result){
+                                var results = result['results'];
                                 // analyticsPanel formatting
                                 $("#analyticsPanel").html("<div class='card'>" +
                                                             "<h5 class='card-header'>Summary</h5>" +
@@ -73,7 +74,7 @@
                                                                         "<div class='ms-2 me-auto'>" +
                                                                             "<div class='fw-bold'>Num of Results</div>" +
                                                                         "</div>" +
-                                                                        "<span class='badge bg-primary rounded-pill'>" + Object.keys(result).length + "</span>" +
+                                                                        "<span class='badge bg-primary rounded-pill'>" + Object.keys(results).length + "</span>" +
                                                                     "</li>" +
                                                                 "</ol>" +
                                                             "</div>" +
@@ -85,15 +86,15 @@
                                 var graph = Viva.Graph.graph();
                                 
                                 // popoliamo il grafo con i nodi
-                                for(kg in result){
-                                    graph.addNode(result[kg].id, result[kg]);
+                                for(kg in results){
+                                    graph.addNode(results[kg].id, results[kg]);
                                 }
                                 //aggiungiamo i link tra i nodi del grafo
-                                for(kg in result){
-                                    var currKGLinks = result[kg].links;
+                                for(kg in results){
+                                    var currKGLinks = results[kg].links;
                                     for(link in currKGLinks){
                                         if(graph.getNode(currKGLinks[link].target) != null){
-                                            graph.addLink(result[kg].id, currKGLinks[link].target, currKGLinks[link].value);
+                                            graph.addLink(results[kg].id, currKGLinks[link].target, currKGLinks[link].value);
                                         }
                                     }
                                 }

@@ -38,6 +38,8 @@
                             url: "/"+path+"?keyword="+target+"&rankBy="+rankingMode+"&tags="+tags,
                             success: function(result){
 
+                                var results = result['results'];
+
                                 // analyticsPanel formatting
                                 $("#analyticsPanel").html("<div class='card'>" +
                                                                 "<h5 class='card-header'>Summary</h5>" +
@@ -56,7 +58,7 @@
                                                                                 "<td>" + target + "</td>" +
                                                                                 "<td>" + rankingMode + "</td>" +
                                                                                 "<td>" + path + "</td>" +
-                                                                                "<td>" + Object.keys(result).length + "</td>" +
+                                                                                "<td>" + Object.keys(results).length + "</td>" +
                                                                             "</tr>" +
                                                                         "</tbody>" + 
                                                                     "</table>" +
@@ -65,31 +67,31 @@
                                                             "</div>");
 
                                 var i = 1;
-                                for(kg in result){
+                                for(kg in results){
 
                                     //description formatting
                                     var currDescription = '<p>';
-                                    if(JSON.stringify(result[kg]["description"]).length > 600){
-                                        currDescription += result[kg]["description"].slice(0, 600) + 
+                                    if(JSON.stringify(results[kg]["description"]).length > 600){
+                                        currDescription += results[kg]["description"].slice(0, 600) + 
                                                             "<span id='dots" + i + "'>...</span><span style='display: none;' id='more" + i + "'>" + 
-                                                            result[kg]["description"].slice(600) + "</span><button type='button' class='btn btn-link' onclick='collapseDescription(" + i + ")' id='myBtn" + i + "'>Read more</button></p>";                            
+                                                            results[kg]["description"].slice(600) + "</span><button type='button' class='btn btn-link' onclick='collapseDescription(" + i + ")' id='myBtn" + i + "'>Read more</button></p>";                            
                                     }else
-                                        currDescription += result[kg]["description"] + "</p>";
+                                        currDescription += results[kg]["description"] + "</p>";
                                         
                                     //keywords formatting section
                                     var currentKeywords  = "<pre>"
-                                    for(key in result[kg]["keywords"]){
-                                    currentKeywords += "<span class='badge rounded-pill bg-secondary'>" + result[kg]["keywords"][key] + "</span>"
+                                    for(key in results[kg]["keywords"]){
+                                    currentKeywords += "<span class='badge rounded-pill bg-secondary'>" + results[kg]["keywords"][key] + "</span>"
                                     }
                                     currentKeywords += "</pre>";
 
                                     //links formatting section
                                     var currentLinks;
-                                    if(result[kg]["links"] != ""){
+                                    if(results[kg]["links"] != ""){
                                         currentLinks = "<pre><ul class='list-group'>";
-                                        for(link in result[kg]["links"]){
+                                        for(link in results[kg]["links"]){
                                             currentLinks += "<li class='list-group-item d-flex justify-content-between align-items-center'>" +
-                                                            result[kg]["links"][link]["target"] + "<span class='badge bg-primary rounded-pill'>" + result[kg]["links"][link]["value"] + "</span>"+
+                                                            results[kg]["links"][link]["target"] + "<span class='badge bg-primary rounded-pill'>" + results[kg]["links"][link]["value"] + "</span>"+
                                                             "</li>";
                                         }
                                         currentLinks += "</ul></pre>";
@@ -98,7 +100,7 @@
 
                                     //sparql formatting section
                                     var sparqlEnd;
-                                    if(result[kg]["sparql"] != null){
+                                    if(results[kg]["sparql"] != null){
                                         sparqlEnd = "<div class='list-group'>" +
                                                         "<div  class='list-group-item'>" +
                                                             "<div class='d-flex w-100 justify-content-between'>" +
@@ -107,8 +109,8 @@
                                                                 "<button style='border:none;background-color:white' onclick='checkAvailability("+i+")'><span class='badge rounded-pill bg-primary'>Check Availability</span></button>"+
                                                             "</div>" +                                                            
                                                             "</div>" +
-                                                            "<p class='mb-1'>" +  result[kg]["sparql"]["description"] + "</p>" +
-                                                            "<a href='"+result[kg].sparql.access_url+"'><small id='endpoint-"+i+"'>" + result[kg]["sparql"]["access_url"] + "</small></a>" +
+                                                            "<p class='mb-1'>" +  results[kg]["sparql"]["description"] + "</p>" +
+                                                            "<a href='"+results[kg].sparql.access_url+"'><small id='endpoint-"+i+"'>" + results[kg]["sparql"]["access_url"] + "</small></a>" +
                                                         "</div>" + 
                                                         "</div>";
                                         
@@ -126,15 +128,15 @@
                                     $("#accordionPanels").append("<div clas s='accordion-item'>" +
                                                                     "<h2 class='accordion-header' id='panelsStayOpen-heading" + i + "''>" +
                                                                         "<button class='accordion-button collapsed' type='button' data-bs-toggle='collapse' data-bs-target='#panelsStayOpen-collapse"+i+"' aria-expanded='false' aria-controls='panelsStayOpen-collapse"+i+"'>" +
-                                                                        "#"+i+"__<strong>" + result[kg]["title"] + "</strong>" +
+                                                                        "#"+i+"__<strong>" + results[kg]["title"] + "</strong>" +
                                                                         "</button>" +
                                                                     "</h2>" + 
                                                                     "<div id='panelsStayOpen-collapse"+i+"' class='accordion-collapse collapse' aria-labelledby='panelsStayOpen-heading"+i+"'>" +
                                                                         "<div class='accordion-body'>" +
-                                                                            "<strong>Id: </strong>" + result[kg]["id"] +
+                                                                            "<strong>Id: </strong>" + results[kg]["id"] +
                                                                             "<br><strong>Description: </strong>" + currDescription +
-                                                                            "<br><strong>Website: </strong><a href='" + result[kg]["website"] + "'>" + result[kg]["website"] + "</a>" + 
-                                                                            "<br><strong>Triples: </strong>" + result[kg]["triples"] +
+                                                                            "<br><strong>Website: </strong><a href='" + results[kg]["website"] + "'>" + results[kg]["website"] + "</a>" + 
+                                                                            "<br><strong>Triples: </strong>" + results[kg]["triples"] +
                                                                             "<br><strong>Keywords: </strong>" + currentKeywords +
                                                                             "<strong>Links: </strong>" + currentLinks +
                                                                             "<br><br>" + sparqlEnd +
