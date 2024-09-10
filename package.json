@@ -10,7 +10,7 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.18.2",
     "kgs_results_aggregator": "^0.1.8",
     "path": "^0.12.7"
   },

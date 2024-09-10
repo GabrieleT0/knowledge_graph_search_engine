@@ -35,7 +35,7 @@
                         $("svg").hide();
 
                         $.ajax({
-                            url: "/"+path+"?keyword="+target+"&rankBy="+rankingMode+"&tags="+tags,
+                            url: "/kgsearchengine/"+path+"?keyword="+target+"&rankBy="+rankingMode+"&tags="+tags,
                             success: function(result){
 
                                 var results = result['results'];
@@ -63,7 +63,7 @@
                                                                         "</tbody>" + 
                                                                     "</table>" +
                                                                 "</div>" +
-                                                                "<div class='card-footer text-muted text-center'><a href='results.json' class='btn btn-primary' download>Download</a></div>" +
+                                                                "<div class='card-footer text-muted text-center'><a href='/kgsearchengine/results.json' class='btn btn-primary' download>Download</a></div>" +
                                                             "</div>");
 
                                 var i = 1;
@@ -154,7 +154,7 @@
            function checkAvailability(i){
                endpoint = $("#endpoint-"+i).text();
                $.ajax({
-                   url: "/checkAvailability?target="+endpoint,
+                   url: "/kgsearchengine/checkAvailability?target="+endpoint,
                    beforeSend: function(){
                        $("#dinamicPart-"+i).html("");
                        $("#dinamicPart-"+i).html("<div class='spinner-border' role='status'></div>");                       
@@ -209,8 +209,8 @@
               </button>
               <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
-                  <a class="nav-link active" aria-current="page" href="https://kgs-search-engine.herokuapp.com">Home</a>
-                  <a class="nav-link" href="https://kgs-search-engine.herokuapp.com/graphmode">Graph Visualization Mode</a>                  
+                  <a class="nav-link active" aria-current="page" href="http://www.isislab.it:12280/kgsearchengine/">Home</a>
+                  <a class="nav-link" href="http://www.isislab.it:12280/kgsearchengine/graphmode">Graph Visualization Mode</a>                  
                 </div>
               </div>
             </div>

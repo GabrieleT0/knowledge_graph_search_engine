@@ -44,7 +44,7 @@
                         $("#graphArea").html("");
                         
                         $.ajax({
-                            url: "/"+path+"?keyword="+target+"&rankBy="+rankingMode+"&tags="+tags,
+                            url: "/kgsearchengine/"+path+"?keyword="+target+"&rankBy="+rankingMode+"&tags="+tags,
                             success: function(result){
                                 var results = result['results'];
                                 // analyticsPanel formatting
@@ -235,7 +235,7 @@
                                             $('#offcanvasScrolling').offcanvas('show');
                                             $("#currentEndpoint").click(function(){
                                                 $.ajax({
-                                                    url: "/checkAvailability"+"?target="+node.data.sparql.access_url,
+                                                    url: "/kgsearchengine/checkAvailability"+"?target="+node.data.sparql.access_url,
                                                     beforeSend: function(){
                                                         $("#dinamicPart").html("");
                                                         $("#dinamicPart").html("<div class='spinner-border' role='status'></div>")
